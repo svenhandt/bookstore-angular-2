@@ -1,0 +1,19 @@
+
+.product-list-header {
+  margin-top: 50px;
+  margin-bottom: 50px;
+  text-align: center;
+  color: darkblue;
+}
+
+.product-list-sort{
+  display: flex;
+  justify-content: right;
+  margin-bottom: 20px;
+}
+
+.nobooks {
+  text-align: center;
+  color: darkblue;
+  font-style: italic;
+}

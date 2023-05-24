@@ -1,0 +1,148 @@
+<div class="container">
+  <div class="row">
+    <div class="col-6">
+      <div class="row login-register-header">
+        <h3>Anmelden</h3>
+      </div>
+      <div class="row login-register-form">
+        <form>
+          <div class="mb-3">
+            <label for="loginEmail" class="form-label">E-Mail-Adresse</label>
+            <input type="text" class="form-control" id="loginEmail">
+          </div>
+          <div class="mb-3">
+            <label for="loginPassword" class="form-label">Passwort</label>
+            <input type="password" class="form-control" id="loginPassword">
+          </div>
+          <div class="login-register-buttons">
+            <button type="button" class="btn btn-secondary">Zurücksetzen</button>&nbsp;&nbsp;
+            <button type="submit" class="btn btn-primary">Anmelden</button>
+          </div>
+        </form>
+      </div>
+    </div>
+    <div class="col-6">
+      <div class="row login-register-header">
+        <h3>Registrieren</h3>
+      </div>
+      <div class="row login-register-form">
+        <form (ngSubmit)="onRegister()" #registerForm="ngForm">
+          <div class="mb-3">
+            <label for="firstName" class="form-label">Vorname</label>
+            <input type="text"
+                   class="form-control"
+                   id="firstName"
+                   name="firstName"
+                   ngModel
+                   required
+                   #firstName="ngModel">
+            <p class="alert alert-danger" *ngIf="!firstName.valid && firstName.touched">Bitte geben Sie einen Vornamen ein</p>
+          </div>
+          <div class="mb-3">
+            <label for="lastName" class="form-label">Nachname</label>
+            <input type="text"
+                   class="form-control"
+                   id="lastName"
+                   name="lastName"
+                   ngModel
+                   required
+                   #lastName="ngModel">
+            <p class="alert alert-danger" *ngIf="!lastName.valid && lastName.touched">Bitte geben Sie einen Nachnamen ein</p>
+          </div>
+          <div class="mb-3">
+            <div class="col">
+              <label class="form-label">Strasse und Nr.</label>
+              <div class="input-group">
+                <input type="text"
+                       class="form-control"
+                       id="street"
+                       name="street"
+                       ngModel
+                       required
+                       #street="ngModel">
+                <input type="text"
+                       class="form-control"
+                       id="streetNumber"
+                       name="streetNumber"
+                       ngModel
+                       required
+                       #streetNumber="ngModel">
+              </div>
+              <p class="alert alert-danger" *ngIf="!street.valid && street.touched">Bitte geben Sie eine Strasse ein</p>
+              <p class="alert alert-danger" *ngIf="!streetNumber.valid && streetNumber.touched">Bitte geben Sie eine Haus-Nr. ein</p>
+            </div>
+          </div>
+          <div class="mb-3">
+            <div class="col">
+              <label class="form-label">PLZ und Ort</label>
+              <div class="input-group">
+                <input type="text"
+                       class="form-control"
+                       id="zipCode"
+                       name="zipCode"
+                       ngModel
+                       required
+                       pattern="^[0-9]{5}$"
+                       #zipCode="ngModel">
+                <input type="text"
+                       class="form-control"
+                       id="town"
+                       name="town"
+                       ngModel
+                       required
+                       #town="ngModel">
+              </div>
+              <p class="alert alert-danger" *ngIf="!zipCode.valid && zipCode.touched">Bitte geben Sie eine gültige PLZ ein</p>
+              <p class="alert alert-danger" *ngIf="!town.valid && town.touched">Bitte geben Sie einen Ort ein</p>
+            </div>
+          </div>
+          <br/><br/>
+          <div class="mb-3">
+            <label for="registerEmail" class="form-label">E-Mail-Adresse</label>
+            <input type="text"
+                   class="form-control"
+                   id="registerEmail"
+                   name="registerEmail"
+                   ngModel
+                   required
+                   email
+                   #registerEmail="ngModel">
+            <p class="alert alert-danger" *ngIf="!registerEmail.valid && registerEmail.touched">Bitte geben Sie eine gültige E-Mail-Adresse ein</p>
+          </div>
+          <div class="mb-3">
+            <label for="registerPassword" class="form-label">Passwort</label>
+            <input type="password"
+                   class="form-control"
+                   id="registerPassword"
+                   name="registerPassword"
+                   ngModel
+                   required
+                   #registerPassword="ngModel">
+            <p class="alert alert-danger" *ngIf="!registerPassword.valid && registerPassword.touched">Bitte geben Sie ein Passwort ein</p>
+          </div>
+          <div class="mb-3">
+            <label for="registerPasswordRepeat" class="form-label">Passwort wiederholen</label>
+            <input type="password"
+                   class="form-control"
+                   id="registerPasswordRepeat"
+                   name="registerPasswordRepeat"
+                   ngModel
+                   required
+                   #registerPasswordRepeat="ngModel">
+            <p class="alert alert-danger" *ngIf="(!registerPasswordRepeat.valid || !registerPasswordFieldValuesEqual()) && registerPasswordRepeat.touched">
+              Eingegebene Passwörter müssen gleich sein
+            </p>
+          </div>
+          <div class="login-register-buttons">
+            <button type="button" class="btn btn-secondary">Zurücksetzen</button>&nbsp;&nbsp;
+            <button type="submit"
+                    class="btn btn-primary"
+                    [disabled]="!registerForm.valid">
+              Registrieren
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>

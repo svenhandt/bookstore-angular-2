@@ -1,0 +1,27 @@
+
+.shop-headline {
+  margin-top: 10px;
+  margin-bottom: 20px;
+}
+
+.shop-headline h1 {
+  color: darkblue;
+  text-align: center;
+}
+
+nav.bookstore {
+  background-color: blueviolet;
+  margin-bottom: 20px;
+}
+
+.nav-item {
+  min-width: 130px;
+}
+
+a.nav-link {
+  color: white;
+}
+
+a.nav-link.active {
+  color: aqua;
+}

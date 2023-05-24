@@ -1,0 +1,71 @@
+<div class="container">
+  <div class="row">
+    <div class="col-12 product-list-header">
+      <h3 *ngIf="currentCategory?.id">Kategorie: {{currentCategory?.name | localized}}</h3>
+      <h3 *ngIf="searchQuery">Ihre Suchergebnisse für: {{searchQuery}}</h3>
+    </div>
+  </div>
+  <ng-container *ngIf="products.length > 0">
+    <div class="row">
+      <div class="col-12 product-list-sort">
+        <div class="dropdown">
+          <button class="btn btn-primary dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+            Sortieren nach
+          </button>
+          <ul class="dropdown-menu">
+            <li>
+              <a [ngClass]="['dropdown-item', sortByTitle ? 'active' : '']"
+                 style="cursor: pointer"
+                 (click)="onSortProductsByTitle()">
+                Titel
+              </a>
+            </li>
+            <li>
+              <a [ngClass]="['dropdown-item', sortByPrice ? 'active' : '']"
+                 style="cursor: pointer"
+                 (click)="onSortProductsByPrice()">
+                Preis
+              </a>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </div>
+    <div class="row">
+      <table class="table">
+        <tbody>
+        <tr *ngFor="let product of products">
+          <th scope="row">
+            <img class="img-fluid" style="max-height: 200px" [src]="product.imageUrl">
+          </th>
+          <td colspan="2">
+            <div class="row">
+              <h5>{{product.name}}</h5>
+            </div>
+            <div class="row">
+              <p>{{product.author}}</p>
+            </div>
+          </td>
+          <td>
+            <div class="row">
+              <p>{{product.price | currency:'EUR':'symbol':'1.2-2'}}</p>
+            </div>
+          </td>
+          <td>
+            <div class="row">
+              <a class="link-info" style="cursor: pointer" (click)="navigateToProductDetails(product)">Details</a>
+            </div>
+          </td>
+        </tr>
+        </tbody>
+      </table>
+    </div>
+  </ng-container>
+
+  <ng-container *ngIf="products.length <= 0">
+    <div class="row nobooks">
+      <h5>Keine Bücher gefunden</h5>
+    </div>
+  </ng-container>
+
+</div>

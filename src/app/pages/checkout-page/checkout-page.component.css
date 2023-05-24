@@ -1,0 +1,30 @@
+
+.delivery-address {
+  text-align: center;
+  margin-top: 50px;
+  margin-bottom: 50px;
+}
+
+.payment-header {
+  text-align: center;
+  margin-top: 50px;
+  margin-bottom: 20px;
+}
+
+.payment {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 50px;
+}
+
+#cardName {
+  min-width: 400px;
+}
+
+#cvv {
+  max-width: 150px;
+}
+
+.checkout-buttons button {
+  margin-top: 10px;
+}

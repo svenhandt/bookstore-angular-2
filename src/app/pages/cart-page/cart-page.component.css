@@ -1,0 +1,29 @@
+
+.cart-page-header {
+  margin-top: 50px;
+  margin-bottom: 50px;
+  text-align: center;
+  color: darkblue;
+}
+
+.cart-page-total {
+  margin-top: 50px;
+  margin-bottom: 20px;
+  text-align: right;
+}
+
+.checkout {
+  display: flex;
+  justify-content: right;
+  margin-bottom: 100px;
+}
+
+.empty-cart {
+  text-align: center;
+  color: darkblue;
+  font-style: italic;
+}
+
+.checkout button {
+  min-width: 200px;
+}

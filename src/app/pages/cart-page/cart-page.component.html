@@ -1,0 +1,66 @@
+<div class="container">
+  <div class="row">
+    <div class="col-12 cart-page-header">
+      <h3>Ihr Warenkorb</h3>
+    </div>
+  </div>
+  <ng-container *ngIf="(currentCart$ | async) as cart">
+    <div class="row empty-cart" *ngIf="cart.entries.length === 0">
+      <h5>Ihr Warenkorb ist leer</h5>
+    </div>
+    <ng-container *ngIf="cart.entries.length > 0">
+      <div class="row">
+        <table class="table">
+          <tbody>
+          <tr *ngFor="let entry of cart.entries">
+            <th scope="row">
+              <img class="img-fluid" style="max-height: 200px" [src]="entry.product.imageUrl">
+            </th>
+            <td>
+              <div class="row">
+                <h4>{{entry.product.name}}</h4>
+              </div>
+              <div class="row">
+                <p>{{entry.product.author}}</p>
+              </div>
+              <div class="row">
+                <p>ISBN: {{entry.product.isbn}}</p>
+              </div>
+            </td>
+            <td>
+              <div class="row">
+                <p>Anzahl: {{entry.quantity}}</p>
+              </div>
+            </td>
+            <td>
+              <div class="row">
+                <p style="font-weight: bold">{{entry.entryTotalPrice | currency:'EUR':'symbol':'1.2-2'}}</p>
+              </div>
+            </td>
+            <td>
+              <div class="row">
+                <button
+                  class="btn btn-danger btn-sm"
+                  type="button"
+                  (click)="onRemoveEntry(entry)">Entfernen</button>
+              </div>
+            </td>
+          </tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="row">
+        <div class="col-12 cart-page-total">
+          <h4>Gesamtpreis: {{cart.totalPrice | currency:'EUR':'symbol':'1.2-2'}}</h4>
+          <p *ngIf="!cart.totalTax">inkl. MwSt</p>
+          <p *ngIf="cart.totalTax">MwSt: {{cart.totalTax | currency:'EUR':'symbol':'1.2-2'}}</p>
+        </div>
+      </div>
+      <div class="row">
+        <div class="col-12 checkout">
+          <button class="btn btn-primary" type="button">Zum Kauf</button>
+        </div>
+      </div>
+    </ng-container>
+  </ng-container>
+</div>

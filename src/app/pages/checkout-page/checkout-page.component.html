@@ -1,0 +1,67 @@
+<app-small-header></app-small-header>
+<div class="container">
+  <div class="row delivery-address">
+    <div class="col-12">
+      <h3>Ihre Lieferadresse</h3>
+      <span>
+        Sven Handt<br/>
+        Vogelstrasse 3<br/>
+        59073 Hamm<br/>
+        Telefon: 015253572143<br/>
+      </span>
+    </div>
+  </div>
+  <hr/>
+  <div class="row payment-header">
+    <div class="col-12">
+      <h4>Bitte geben Sie Ihre Kreditkartendaten ein:</h4>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col-12 payment">
+      <form>
+        <div class="mb-3">
+          <label for="cardName" class="form-label">Karteninhaber</label>
+          <input type="text" class="form-control" id="cardName">
+        </div>
+        <div class="mb-3">
+          <label for="cardNumber" class="form-label">Kreditkarten-Nr.</label>
+          <input type="text" class="form-control" id="cardNumber">
+        </div>
+        <div class="mb-3">
+          <div class="col">
+            <label class="form-label">Ablaufdatum</label>
+            <div class="input-group">
+              <div class="dropdown">
+                <button class="btn btn-outline-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                  Monat
+                </button>
+                <ul class="dropdown-menu">
+                  <li *ngFor="let month of months"><a class="dropdown-item" href="#">{{month}}</a></li>
+                </ul>
+              </div>
+              &nbsp;&nbsp;
+              <div class="dropdown">
+                <button class="btn btn-outline-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                  Jahr
+                </button>
+                <ul class="dropdown-menu">
+                  <li *ngFor="let year of years"><a class="dropdown-item" href="#">{{year}}</a></li>
+                </ul>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="mb-3">
+          <label for="cvv" class="form-label">CVV</label>
+          <input type="text" class="form-control" id="cvv">
+        </div>
+        <div class="checkout-buttons">
+          <button type="button" class="btn btn-secondary">Zurücksetzen</button>&nbsp;&nbsp;
+          <button type="submit" class="btn btn-primary">Zur Bestellübersicht</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+<app-checkout-footer></app-checkout-footer>

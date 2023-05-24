@@ -1,0 +1,29 @@
+
+.edit-customer-header {
+  margin-top: 50px;
+  margin-bottom: 50px;
+  text-align: center;
+  color: darkblue;
+}
+
+.edit-customer {
+  display: flex;
+  justify-content: center;
+}
+
+input#firstName {
+  min-width: 500px;
+}
+
+input#streetNumber {
+  max-width: 100px;
+}
+
+input#zipCode {
+  max-width: 150px;
+}
+
+.edit-customer-buttons {
+  margin-top: 25px;
+  margin-bottom: 50px;
+}

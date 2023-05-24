@@ -1,0 +1,27 @@
+<div class="container">
+  <div class="row">
+    <div class="col-12 product-details-heading">
+      <h3>{{product?.name}}</h3>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col-6">
+      <img class="img-fluid" style="max-height: 400px;" src="{{product?.imageUrl}}">
+    </div>
+    <div class="col-6">
+        <p>{{product?.description}}</p>
+        <p>ISBN: {{product?.isbn}}</p>
+        <p>Autor: {{product?.author}}</p>
+        <p>Erscheinungsjahr: {{product?.releaseYear}}</p>
+        <p>{{product?.numberOfPages}} Seiten</p>
+        <h4>{{product?.price | currency:'EUR':'symbol':'1.2-2'}}</h4>
+    </div>
+  </div>
+  <div>
+    <div class="col-12 product-details-bottom">
+      <button type="button"
+              class="btn btn-primary"
+              (click)="onAddToCart()">In den Warenkorb</button>
+    </div>
+  </div>
+</div>

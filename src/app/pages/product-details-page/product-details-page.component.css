@@ -1,0 +1,13 @@
+
+.product-details-heading {
+  color: darkblue;
+  text-align: center;
+  margin-top: 75px;
+  margin-bottom: 50px;
+}
+
+.product-details-bottom {
+  margin-top: 20px;
+  display: flex;
+  justify-content: right;
+}
