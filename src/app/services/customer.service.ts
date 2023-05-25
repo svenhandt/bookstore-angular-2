@@ -1,30 +1,27 @@
-import { Injectable } from '@angular/core';
-import {BehaviorSubject, Observable} from "rxjs";
+import {Injectable} from '@angular/core';
+import {BehaviorSubject} from "rxjs";
 import {CustomerModel} from "../data/customer.model";
-import {
-  ClientResponse,
-  Customer,
-  CustomerDraft,
-  CustomerSignInResult,
-  MyCustomerDraft
-} from "@commercetools/platform-sdk";
-import apiRoot, {clearTokenCache, rebuildApiRoot} from "./builder/BuildClient";
+import {ClientResponse, Customer, CustomerSignInResult, MyCustomerDraft} from "@commercetools/platform-sdk";
 import {AddressModel} from "../data/address.model";
+import {CommercetoolsApiService} from "./commercetools.api.service";
+import {AbstractCommercetoolsService} from "./abstract/abstract.commercetools.service";
+import {CartService} from "./cart.service";
 
 @Injectable({
   providedIn: 'root'
 })
-export class CustomerService {
+export class CustomerService extends AbstractCommercetoolsService {
 
   currentCustomerSubject = new BehaviorSubject<CustomerModel>(null)
   currentCustomer$ = this.currentCustomerSubject.asObservable()
 
-  constructor() {
-
+  constructor(commercetoolsApiService: CommercetoolsApiService,
+              private cartService: CartService) {
+    super(commercetoolsApiService)
   }
 
   registerCustomer(newCustomer: MyCustomerDraft) {
-    apiRoot.me()
+    this.apiRoot.me()
       .signup()
       .post(
         {
@@ -41,8 +38,9 @@ export class CustomerService {
     const customer = this.createCustomer(customerSignInResult.customer)
     customer.password = newCustomer.password
     localStorage.setItem('current_customer', JSON.stringify(customer))
-    rebuildApiRoot()
+    this.commercetoolsApiService.buildApiRoot()
     this.currentCustomerSubject.next(customer)
+    this.cartService.retrieveCurrentCart()
   }
 
   private createCustomer(rawCustomer: Customer) {

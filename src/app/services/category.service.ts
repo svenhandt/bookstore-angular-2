@@ -1,7 +1,10 @@
 import {Inject, Injectable, LOCALE_ID} from '@angular/core';
 import {BehaviorSubject} from "rxjs";
-import apiRoot from "./builder/BuildClient";
 import {Category, CategoryPagedQueryResponse, ClientResponse} from "@commercetools/platform-sdk";
+import {CommercetoolsApiService} from "./commercetools.api.service";
+import {
+  ByProjectKeyRequestBuilder
+} from "@commercetools/platform-sdk/dist/declarations/src/generated/client/by-project-key-request-builder";
 
 
 @Injectable({
@@ -18,11 +21,16 @@ export class CategoryService {
   categories$ = this.categoriesSubject.asObservable()
   selectedCategory$ = this.selectedCategorySubject.asObservable()
 
-  constructor(@Inject(LOCALE_ID) private locale: string) {
-    this.loadAllCategories()
+  constructor(@Inject(LOCALE_ID) private locale: string,
+              private commercetoolsApiService: CommercetoolsApiService) {
+    this.commercetoolsApiService.apiRoot$.subscribe((apiRoot: ByProjectKeyRequestBuilder) => {
+      this.loadAllCategories(apiRoot)
+    })
   }
 
-  loadAllCategories() {
+
+
+  loadAllCategories(apiRoot: ByProjectKeyRequestBuilder) {
     apiRoot
       .categories()
       .get()

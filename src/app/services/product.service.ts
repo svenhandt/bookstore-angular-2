@@ -1,18 +1,19 @@
 import {Inject, Injectable, LOCALE_ID} from '@angular/core';
 import {ProductModel} from "../data/product.model";
 import {BehaviorSubject} from "rxjs";
-import apiRoot from "./builder/BuildClient";
 import {
   ClientResponse,
   ProductProjection,
   ProductProjectionPagedSearchResponse,
   ProductVariant
 } from "@commercetools/platform-sdk";
+import {CommercetoolsApiService} from "./commercetools.api.service";
+import {AbstractCommercetoolsService} from "./abstract/abstract.commercetools.service";
 
 @Injectable({
   providedIn: 'root'
 })
-export class ProductService {
+export class ProductService extends AbstractCommercetoolsService{
 
   productsSubject = new BehaviorSubject<ProductModel[]>([])
   currentProductSubject = new BehaviorSubject<ProductModel>(new ProductModel())
@@ -22,8 +23,9 @@ export class ProductService {
 
   currentProduct: ProductModel
 
-  constructor(@Inject(LOCALE_ID) private locale: string) {
-
+  constructor(@Inject(LOCALE_ID) private locale: string,
+              commercetoolsApiService: CommercetoolsApiService) {
+    super(commercetoolsApiService)
   }
 
   loadProductsForCategory(categoryId: string) {
@@ -47,7 +49,7 @@ export class ProductService {
   loadProducts(queryArgsObj: any) {
     const products: ProductModel[] = []
 
-    apiRoot
+    this.apiRoot
       .productProjections()
       .search()
       .get(queryArgsObj)
@@ -72,7 +74,7 @@ export class ProductService {
   }
 
   private loadProductFromCommercetools(productId: string) {
-    apiRoot
+    this.apiRoot
       .productProjections()
       .withId({ID: productId})
       .get()

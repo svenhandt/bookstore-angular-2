@@ -1,21 +1,23 @@
 import {Inject, Injectable, LOCALE_ID} from '@angular/core';
 import {CartModel} from "../data/cart.model";
-import {BehaviorSubject, Subject} from "rxjs";
+import {BehaviorSubject} from "rxjs";
 import {ProductModel} from "../data/product.model";
-import apiRoot from "./builder/BuildClient";
 import {CartEntryModel} from "../data/cartentry.model";
 import {Cart, ClientResponse, MyCartUpdateAction} from "@commercetools/platform-sdk";
+import {CommercetoolsApiService} from "./commercetools.api.service";
+import {AbstractCommercetoolsService} from "./abstract/abstract.commercetools.service";
 
 @Injectable({
   providedIn: 'root'
 })
-export class CartService {
+export class CartService extends AbstractCommercetoolsService {
 
   cartSubject = new BehaviorSubject<CartModel>(new CartModel())
   currentCart$ = this.cartSubject.asObservable()
 
-  constructor(@Inject(LOCALE_ID) private locale: string) {
-
+  constructor(@Inject(LOCALE_ID) private locale: string,
+              commercetoolsApiService: CommercetoolsApiService) {
+    super(commercetoolsApiService)
   }
 
   retrieveCurrentCart() {
@@ -42,7 +44,7 @@ export class CartService {
       const id = currentCart.id
       const version = currentCart.version
       if(id && version) {
-        apiRoot
+        this.apiRoot
           .me()
           .carts()
           .withId({ID: id})
@@ -63,7 +65,7 @@ export class CartService {
   }
 
   private getActiveCart() {
-    apiRoot
+    this.apiRoot
       .me()
       .activeCart()
       .get()
@@ -76,7 +78,7 @@ export class CartService {
   }
 
   private createCart() {
-    apiRoot
+    this.apiRoot
       .me()
       .carts()
       .post({
