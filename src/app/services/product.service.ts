@@ -7,7 +7,7 @@ import {
   ProductProjectionPagedSearchResponse,
   ProductVariant
 } from "@commercetools/platform-sdk";
-import {CommercetoolsApiService} from "./commercetools.api.service";
+import {CommercetoolsApiService} from "./infrastructure/commercetools.api.service";
 import {AbstractCommercetoolsService} from "./abstract/abstract.commercetools.service";
 
 @Injectable({

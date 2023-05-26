@@ -4,9 +4,13 @@
   margin-bottom: 20px;
 }
 
-.shop-headline h1 {
+.shop-headline h1, .shop-headline p {
   color: darkblue;
   text-align: center;
+}
+
+.shop-headline p {
+  font-style: italic;
 }
 
 nav.bookstore {

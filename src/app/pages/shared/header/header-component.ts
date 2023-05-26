@@ -6,11 +6,14 @@ import {NgForm} from "@angular/forms";
 import {CartService} from "../../../services/cart.service";
 import {CartModel} from "../../../data/cart.model";
 import {Category} from "@commercetools/platform-sdk";
+import {CustomerService} from "../../../services/customer.service";
+import {CustomerModel} from "../../../data/customer.model";
 
 interface HeaderComponentData {
   categories: Category[]
   selectedCategory: Category
   currentCart: CartModel
+  currentCustomer: CustomerModel
 }
 
 @Component({
@@ -24,11 +27,13 @@ export class HeaderComponent implements OnInit {
   categories$: Observable<Category[]>
   selectedCategory$: Observable<Category>
   currentCart$: Observable<CartModel>
+  currentCustomer$: Observable<CustomerModel>
 
   @ViewChild('searchForm', {static: false}) searchForm: NgForm
 
   constructor(private categoryService: CategoryService,
               private cartService: CartService,
+              private customerService: CustomerService,
               private router: Router) { }
 
   ngOnInit(): void {
@@ -41,13 +46,17 @@ export class HeaderComponent implements OnInit {
     const currentCart$ = this.cartService.currentCart$.pipe(
       startWith(null)
     )
-    this.headerComponentData$ = combineLatest([categories$, selectedCategory$, currentCart$])
+    const currentCustomer$ = this.customerService.currentCustomer$.pipe(
+      startWith(null)
+    )
+    this.headerComponentData$ = combineLatest([categories$, selectedCategory$, currentCart$, currentCustomer$])
       .pipe(
-        map(([categories, selectedCategory, currentCart]) => {
+        map(([categories, selectedCategory, currentCart, currentCustomer]) => {
           return {
             categories: categories,
             selectedCategory: selectedCategory,
-            currentCart: currentCart
+            currentCart: currentCart,
+            currentCustomer: currentCustomer
           }
         })
       )
@@ -60,6 +69,10 @@ export class HeaderComponent implements OnInit {
         category: category.key
         }})
     this.categoryService.setSelectedCategory(category.key)
+  }
+
+  onLogout() {
+    this.customerService.logoutCurrentCustomer()
   }
 
   onSubmitSearchForm() {

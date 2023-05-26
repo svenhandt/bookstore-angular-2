@@ -22,6 +22,7 @@ import { registerLocaleData } from '@angular/common';
 import localeDe from '@angular/common/locales/de';
 import {FormsModule} from "@angular/forms";
 import { LocalizedPipe } from './pipes/localized.pipe';
+import { MatchPasswordDirective } from './directives/match-password.directive';
 
 registerLocaleData(localeDe)
 
@@ -43,6 +44,7 @@ registerLocaleData(localeDe)
     SmallHeaderComponent,
     CheckoutFooterComponent,
     LocalizedPipe,
+    MatchPasswordDirective,
   ],
   imports: [
     BrowserModule,

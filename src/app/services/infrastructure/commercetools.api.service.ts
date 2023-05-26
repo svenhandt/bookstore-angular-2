@@ -10,9 +10,9 @@ import {
   TokenCacheOptions,
   TokenStore
 } from "@commercetools/sdk-client-v2";
-import {environment} from "../../environments/environment";
+import {environment} from "../../../environments/environment";
 import fetch from "node-fetch";
-import {CustomerModel} from "../data/customer.model";
+import {CustomerModel} from "../../data/customer.model";
 import {
   ByProjectKeyRequestBuilder
 } from "@commercetools/platform-sdk/dist/declarations/src/generated/client/by-project-key-request-builder";

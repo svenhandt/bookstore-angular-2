@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import {ActivatedRoute} from "@angular/router";
-import {CurrentPageService} from "../../services/util/current-page.service";
+import {CurrentPageService} from "../../services/infrastructure/current-page.service";
 
 @Component({
   selector: 'app-homepage',

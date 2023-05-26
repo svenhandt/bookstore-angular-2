@@ -1,6 +1,6 @@
 import {Component, OnDestroy, OnInit} from '@angular/core';
 import {ActivatedRoute, Params, Router} from "@angular/router";
-import {CurrentPageService} from "../../services/util/current-page.service";
+import {CurrentPageService} from "../../services/infrastructure/current-page.service";
 import {CategoryService} from "../../services/category.service";
 import {Subscription, switchMap} from "rxjs";
 import {ProductService} from "../../services/product.service";

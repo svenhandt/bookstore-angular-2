@@ -3,9 +3,12 @@ import {BehaviorSubject} from "rxjs";
 import {CustomerModel} from "../data/customer.model";
 import {ClientResponse, Customer, CustomerSignInResult, MyCustomerDraft} from "@commercetools/platform-sdk";
 import {AddressModel} from "../data/address.model";
-import {CommercetoolsApiService} from "./commercetools.api.service";
+import {CommercetoolsApiService} from "./infrastructure/commercetools.api.service";
 import {AbstractCommercetoolsService} from "./abstract/abstract.commercetools.service";
 import {CartService} from "./cart.service";
+import {Router} from "@angular/router";
+
+const CURRENT_CUSTOMER = 'current_customer'
 
 @Injectable({
   providedIn: 'root'
@@ -18,6 +21,7 @@ export class CustomerService extends AbstractCommercetoolsService {
   constructor(commercetoolsApiService: CommercetoolsApiService,
               private cartService: CartService) {
     super(commercetoolsApiService)
+    this.initCurrentCustomer()
   }
 
   registerCustomer(newCustomer: MyCustomerDraft) {
@@ -34,10 +38,27 @@ export class CustomerService extends AbstractCommercetoolsService {
       })
   }
 
+  logoutCurrentCustomer() {
+    localStorage.removeItem(CURRENT_CUSTOMER)
+    this.commercetoolsApiService.buildApiRoot()
+    this.currentCustomerSubject.next(null)
+    this.cartService.retrieveCurrentCart()
+  }
+
+  private initCurrentCustomer() {
+    const currentCustomerStr = localStorage.getItem(CURRENT_CUSTOMER)
+    if(currentCustomerStr) {
+      const currentCustomer = <CustomerModel>JSON.parse(currentCustomerStr)
+      if(currentCustomer.id) {
+        this.currentCustomerSubject.next(currentCustomer)
+      }
+    }
+  }
+
   private handleRegistrationSuccess(customerSignInResult: CustomerSignInResult, newCustomer: MyCustomerDraft) {
     const customer = this.createCustomer(customerSignInResult.customer)
     customer.password = newCustomer.password
-    localStorage.setItem('current_customer', JSON.stringify(customer))
+    localStorage.setItem(CURRENT_CUSTOMER, JSON.stringify(customer))
     this.commercetoolsApiService.buildApiRoot()
     this.currentCustomerSubject.next(customer)
     this.cartService.retrieveCurrentCart()

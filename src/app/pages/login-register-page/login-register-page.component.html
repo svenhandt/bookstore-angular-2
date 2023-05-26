@@ -26,7 +26,9 @@
         <h3>Registrieren</h3>
       </div>
       <div class="row login-register-form">
-        <form (ngSubmit)="onRegister()" #registerForm="ngForm">
+        <form (ngSubmit)="onRegister()"
+              #registerForm="ngForm"
+              [appMatchPassword]="['registerPassword', 'registerPasswordRepeat']">
           <div class="mb-3">
             <label for="firstName" class="form-label">Vorname</label>
             <input type="text"

@@ -1,5 +1,5 @@
 import { Component } from '@angular/core';
-import {CurrentPageService} from "./services/util/current-page.service";
+import {CurrentPageService} from "./services/infrastructure/current-page.service";
 
 @Component({
   selector: 'app-root',

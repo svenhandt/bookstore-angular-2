@@ -1,9 +1,10 @@
-<div class="container">
-  <div class="shop-headline row justify-content-center">
-    <h1>Commercetools Bookstore</h1>
-  </div>
-</div>
 <ng-container *ngIf="(headerComponentData$ | async) as headerComponentData">
+  <div class="container">
+    <div class="shop-headline row justify-content-center">
+      <h1>Commercetools Bookstore</h1>
+      <p *ngIf="headerComponentData.currentCustomer">angemeldet als: {{headerComponentData.currentCustomer.firstName}} {{headerComponentData.currentCustomer.lastName}}</p>
+    </div>
+  </div>
   <nav class="bookstore navbar navbar-expand-lg">
     <div class="container-fluid">
       <div class="collapse navbar-collapse" id="navbarSupportedContent">
@@ -18,17 +19,23 @@
               {{category.name | localized}}
             </a>
           </li>
-          <li class="nav-item dropdown">
+          <li class="nav-item dropdown" *ngIf="headerComponentData.currentCustomer">
             <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
               Mein Konto
             </a>
             <ul class="dropdown-menu">
               <li><a class="dropdown-item" href="#">Meine Daten</a></li>
               <li><a class="dropdown-item" href="#">Meine Bestellungen</a></li>
-              <li><a class="dropdown-item" href="#">Logout</a></li>
+              <li>
+                <a class="dropdown-item"
+                     style="cursor: pointer"
+                     (click)="onLogout()">
+                Logout
+                </a>
+              </li>
             </ul>
           </li>
-          <li class="nav-item">
+          <li class="nav-item" *ngIf="!headerComponentData.currentCustomer">
             <a class="nav-link"
                style="cursor: pointer"
                routerLink="/login-register"

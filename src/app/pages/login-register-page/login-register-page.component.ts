@@ -3,6 +3,7 @@ import {NgForm} from "@angular/forms";
 import {CustomerDraft, MyCustomerDraft} from "@commercetools/platform-sdk";
 import {CartService} from "../../services/cart.service";
 import {CustomerService} from "../../services/customer.service";
+import {Router} from "@angular/router";
 
 @Component({
   selector: 'app-login-register-page',
@@ -14,7 +15,8 @@ export class LoginRegisterPageComponent implements OnInit {
   @ViewChild('registerForm', {static: false}) registerForm: NgForm;
 
   constructor(private cartService: CartService,
-              private customerService: CustomerService) { }
+              private customerService: CustomerService,
+              private router: Router) { }
 
   ngOnInit(): void {
   }
@@ -33,6 +35,7 @@ export class LoginRegisterPageComponent implements OnInit {
     if(this.registerForm && this.registerForm.value) {
       const customerToRegister = this.createCustomerToRegister()
       this.customerService.registerCustomer(customerToRegister)
+      this.router.navigate(['/'])
     }
   }
 
@@ -57,15 +60,6 @@ export class LoginRegisterPageComponent implements OnInit {
       defaultBillingAddress: 0
     }
     return customerToRegister
-  }
-
-  private getCurrentCartId(): string {
-    let result = ''
-    const currentCart = this.cartService.cartSubject.getValue()
-    if(currentCart && currentCart.id) {
-      result = currentCart.id
-    }
-    return result
   }
 
 }

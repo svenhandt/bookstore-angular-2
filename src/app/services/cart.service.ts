@@ -4,7 +4,7 @@ import {BehaviorSubject} from "rxjs";
 import {ProductModel} from "../data/product.model";
 import {CartEntryModel} from "../data/cartentry.model";
 import {Cart, ClientResponse, MyCartUpdateAction} from "@commercetools/platform-sdk";
-import {CommercetoolsApiService} from "./commercetools.api.service";
+import {CommercetoolsApiService} from "./infrastructure/commercetools.api.service";
 import {AbstractCommercetoolsService} from "./abstract/abstract.commercetools.service";
 
 @Injectable({

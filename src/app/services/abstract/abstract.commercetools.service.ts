@@ -1,4 +1,4 @@
-import {CommercetoolsApiService} from "../commercetools.api.service";
+import {CommercetoolsApiService} from "../infrastructure/commercetools.api.service";
 import {
   ByProjectKeyRequestBuilder
 } from "@commercetools/platform-sdk/dist/declarations/src/generated/client/by-project-key-request-builder";
