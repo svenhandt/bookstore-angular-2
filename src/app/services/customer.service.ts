@@ -1,14 +1,25 @@
 import {Injectable} from '@angular/core';
 import {BehaviorSubject} from "rxjs";
 import {CustomerModel} from "../data/customer.model";
-import {ClientResponse, Customer, CustomerSignInResult, MyCustomerDraft} from "@commercetools/platform-sdk";
+import {
+  ClientResponse,
+  Customer, CustomerSignin,
+  CustomerSignInResult,
+  MyCustomerDraft,
+  MyCustomerSignin
+} from "@commercetools/platform-sdk";
 import {AddressModel} from "../data/address.model";
 import {CommercetoolsApiService} from "./infrastructure/commercetools.api.service";
 import {AbstractCommercetoolsService} from "./abstract/abstract.commercetools.service";
 import {CartService} from "./cart.service";
 import {Router} from "@angular/router";
+import {BadRequest} from "@commercetools/sdk-client-v2/dist/declarations/src/sdk-client/errors";
 
 const CURRENT_CUSTOMER = 'current_customer'
+
+export enum AuthenticationSuccess {
+  SUCCESS, WRONG_CREDENTIALS, UNKNOWN
+}
 
 @Injectable({
   providedIn: 'root'
@@ -17,6 +28,9 @@ export class CustomerService extends AbstractCommercetoolsService {
 
   currentCustomerSubject = new BehaviorSubject<CustomerModel>(null)
   currentCustomer$ = this.currentCustomerSubject.asObservable()
+
+  loginSuccessSubject = new BehaviorSubject<AuthenticationSuccess>(AuthenticationSuccess.UNKNOWN)
+  loginSuccess$ = this.loginSuccessSubject.asObservable()
 
   constructor(commercetoolsApiService: CommercetoolsApiService,
               private cartService: CartService) {
@@ -38,10 +52,32 @@ export class CustomerService extends AbstractCommercetoolsService {
       })
   }
 
+  loginCustomer(customerSignin: MyCustomerSignin) {
+    this.apiRoot.me()
+      .login()
+      .post({
+        body: customerSignin
+      })
+      .execute()
+      .then(({body}: ClientResponse<CustomerSignInResult>) => {
+        this.handleLoginSuccess(body, customerSignin)
+      })
+      .catch(error => {
+        console.log(error)
+        /*
+        if(error instanceof BadRequest) {
+        }
+
+         */
+        this.loginSuccessSubject.next(AuthenticationSuccess.WRONG_CREDENTIALS)
+      })
+  }
+
   logoutCurrentCustomer() {
     localStorage.removeItem(CURRENT_CUSTOMER)
     this.commercetoolsApiService.buildApiRoot()
     this.currentCustomerSubject.next(null)
+    this.loginSuccessSubject.next(AuthenticationSuccess.UNKNOWN)
     this.cartService.retrieveCurrentCart()
   }
 
@@ -56,8 +92,17 @@ export class CustomerService extends AbstractCommercetoolsService {
   }
 
   private handleRegistrationSuccess(customerSignInResult: CustomerSignInResult, newCustomer: MyCustomerDraft) {
+    this.handleAuthenticationSuccess(customerSignInResult, newCustomer.password)
+  }
+
+  private handleLoginSuccess(customerSignInResult: CustomerSignInResult, customerSignin: CustomerSignin) {
+    this.handleAuthenticationSuccess(customerSignInResult, customerSignin.password)
+    this.loginSuccessSubject.next(AuthenticationSuccess.SUCCESS)
+  }
+
+  private handleAuthenticationSuccess(customerSignInResult: CustomerSignInResult, password: string) {
     const customer = this.createCustomer(customerSignInResult.customer)
-    customer.password = newCustomer.password
+    customer.password = password
     localStorage.setItem(CURRENT_CUSTOMER, JSON.stringify(customer))
     this.commercetoolsApiService.buildApiRoot()
     this.currentCustomerSubject.next(customer)

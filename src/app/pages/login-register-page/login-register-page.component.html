@@ -5,18 +5,36 @@
         <h3>Anmelden</h3>
       </div>
       <div class="row login-register-form">
-        <form>
+        <form (ngSubmit)="onLogin()"
+            #loginForm="ngForm">
           <div class="mb-3">
             <label for="loginEmail" class="form-label">E-Mail-Adresse</label>
-            <input type="text" class="form-control" id="loginEmail">
+            <input type="text"
+                   class="form-control"
+                   id="loginEmail"
+                   name="loginEmail"
+                   ngModel
+                   required
+                   email
+                   #loginEmail="ngModel">
+            <p class="alert alert-danger" *ngIf="!loginEmail.valid && loginEmail.touched">Bitte geben Sie eine gültige E-Mail-Adresse ein</p>
           </div>
           <div class="mb-3">
             <label for="loginPassword" class="form-label">Passwort</label>
-            <input type="password" class="form-control" id="loginPassword">
+            <input type="password"
+                   class="form-control"
+                   id="loginPassword"
+                   name="loginPassword"
+                   ngModel
+                   required
+                   #loginPassword="ngModel">
+            <p class="alert alert-danger" *ngIf="!loginPassword.valid && loginPassword.touched">Bitte geben Sie ein Passwort ein</p>
           </div>
           <div class="login-register-buttons">
             <button type="button" class="btn btn-secondary">Zurücksetzen</button>&nbsp;&nbsp;
-            <button type="submit" class="btn btn-primary">Anmelden</button>
+            <button type="submit"
+                    class="btn btn-primary"
+                    [disabled]="!loginForm.valid">Anmelden</button>
           </div>
         </form>
       </div>
@@ -137,7 +155,9 @@
             </p>
           </div>
           <div class="login-register-buttons">
-            <button type="button" class="btn btn-secondary">Zurücksetzen</button>&nbsp;&nbsp;
+            <button type="button"
+                    class="btn btn-secondary"
+                    (click)="onResetRegisterForm()">Zurücksetzen</button>&nbsp;&nbsp;
             <button type="submit"
                     class="btn btn-primary"
                     [disabled]="!registerForm.valid">

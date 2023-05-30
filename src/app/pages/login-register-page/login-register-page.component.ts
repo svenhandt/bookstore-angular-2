@@ -1,24 +1,33 @@
-import {Component, OnInit, ViewChild} from '@angular/core';
+import {Component, OnDestroy, OnInit, ViewChild} from '@angular/core';
 import {NgForm} from "@angular/forms";
-import {CustomerDraft, MyCustomerDraft} from "@commercetools/platform-sdk";
+import {MyCustomerDraft, MyCustomerSignin} from "@commercetools/platform-sdk";
 import {CartService} from "../../services/cart.service";
-import {CustomerService} from "../../services/customer.service";
+import {AuthenticationSuccess, CustomerService} from "../../services/customer.service";
 import {Router} from "@angular/router";
+import {Subscription} from "rxjs";
 
 @Component({
   selector: 'app-login-register-page',
   templateUrl: './login-register-page.component.html',
   styleUrls: ['./login-register-page.component.css']
 })
-export class LoginRegisterPageComponent implements OnInit {
+export class LoginRegisterPageComponent implements OnInit, OnDestroy {
 
   @ViewChild('registerForm', {static: false}) registerForm: NgForm;
+  @ViewChild('loginForm', {static: false}) loginForm: NgForm;
+
+  private loginSuccessSubscription: Subscription
 
   constructor(private cartService: CartService,
               private customerService: CustomerService,
               private router: Router) { }
 
   ngOnInit(): void {
+    this.loginSuccessSubscription = this.customerService.loginSuccess$.subscribe((authenticationSuccess: AuthenticationSuccess) => {
+      if(authenticationSuccess === AuthenticationSuccess.SUCCESS) {
+        this.router.navigate(['/'])
+      }
+    })
   }
 
   registerPasswordFieldValuesEqual() {
@@ -36,6 +45,17 @@ export class LoginRegisterPageComponent implements OnInit {
       const customerToRegister = this.createCustomerToRegister()
       this.customerService.registerCustomer(customerToRegister)
       this.router.navigate(['/'])
+    }
+  }
+
+  onResetRegisterForm() {
+    this.registerForm.reset()
+  }
+
+  onLogin() {
+    if(this.loginForm && this.loginForm.value) {
+      const customerSignin = this.createCustomerSignin()
+      this.customerService.loginCustomer(customerSignin)
     }
   }
 
@@ -60,6 +80,20 @@ export class LoginRegisterPageComponent implements OnInit {
       defaultBillingAddress: 0
     }
     return customerToRegister
+  }
+
+  private createCustomerSignin(): MyCustomerSignin {
+    const customerSignin: MyCustomerSignin = {
+      email: this.loginForm.value.loginEmail,
+      password: this.loginForm.value.loginPassword
+    }
+    return customerSignin
+  }
+
+  ngOnDestroy(): void {
+    if(this.loginSuccessSubscription) {
+      this.loginSuccessSubscription.unsubscribe()
+    }
   }
 
 }
