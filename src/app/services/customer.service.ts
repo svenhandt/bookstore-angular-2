@@ -4,7 +4,7 @@ import {CustomerModel} from "../data/customer.model";
 import {
   ClientResponse,
   Customer, CustomerSignin,
-  CustomerSignInResult,
+  CustomerSignInResult, ErrorResponse, InvalidCredentialsError,
   MyCustomerDraft,
   MyCustomerSignin
 } from "@commercetools/platform-sdk";
@@ -31,6 +31,9 @@ export class CustomerService extends AbstractCommercetoolsService {
 
   loginSuccessSubject = new BehaviorSubject<AuthenticationSuccess>(AuthenticationSuccess.UNKNOWN)
   loginSuccess$ = this.loginSuccessSubject.asObservable()
+
+  logoutSuccessSubject = new BehaviorSubject<boolean>(false)
+  logoutSuccess$ = this.logoutSuccessSubject.asObservable()
 
   constructor(commercetoolsApiService: CommercetoolsApiService,
               private cartService: CartService) {
@@ -62,13 +65,7 @@ export class CustomerService extends AbstractCommercetoolsService {
       .then(({body}: ClientResponse<CustomerSignInResult>) => {
         this.handleLoginSuccess(body, customerSignin)
       })
-      .catch(error => {
-        console.log(error)
-        /*
-        if(error instanceof BadRequest) {
-        }
-
-         */
+      .catch((error: InvalidCredentialsError)  => {
         this.loginSuccessSubject.next(AuthenticationSuccess.WRONG_CREDENTIALS)
       })
   }
@@ -78,6 +75,7 @@ export class CustomerService extends AbstractCommercetoolsService {
     this.commercetoolsApiService.buildApiRoot()
     this.currentCustomerSubject.next(null)
     this.loginSuccessSubject.next(AuthenticationSuccess.UNKNOWN)
+    this.logoutSuccessSubject.next(true)
     this.cartService.retrieveCurrentCart()
   }
 

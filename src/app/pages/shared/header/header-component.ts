@@ -73,6 +73,8 @@ export class HeaderComponent implements OnInit {
 
   onLogout() {
     this.customerService.logoutCurrentCustomer()
+    this.router.navigate(['/login-register'])
+    this.resetSelectedCategory()
   }
 
   onSubmitSearchForm() {
