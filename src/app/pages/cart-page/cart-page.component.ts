@@ -3,6 +3,8 @@ import {Observable} from "rxjs";
 import {CartModel} from "../../data/cart.model";
 import {CartService} from "../../services/cart.service";
 import {CartEntryModel} from "../../data/cartentry.model";
+import {CustomerService} from "../../services/customer.service";
+import {Router} from "@angular/router";
 
 @Component({
   selector: 'app-cart-page',
@@ -13,7 +15,9 @@ export class CartPageComponent implements OnInit {
 
   currentCart$: Observable<CartModel>
 
-  constructor(private cartService: CartService) {
+  constructor(private cartService: CartService,
+              private customerService: CustomerService,
+              private router: Router) {
 
   }
 
@@ -23,6 +27,14 @@ export class CartPageComponent implements OnInit {
 
   onRemoveEntry(cartEntry: CartEntryModel) {
     this.cartService.removeFromCart(cartEntry)
+  }
+
+  onNavigateToCheckout() {
+    const currentCustomer = this.customerService.currentCustomerSubject.getValue()
+    if(!currentCustomer) {
+      this.customerService.checkoutLoginSubject.next(true)
+    }
+    this.router.navigate(['/checkout'])
   }
 
 }

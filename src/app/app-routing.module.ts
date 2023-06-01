@@ -15,6 +15,8 @@ import {LoginRegisterPageComponent} from "./pages/login-register-page/login-regi
 import {
   EditCustomerDetailsPageComponent
 } from "./pages/edit-customer-details-page/edit-customer-details-page.component";
+import {AuthGuardService} from "./services/auth/auth.guard.service";
+import {LoginPageGuardService} from "./services/auth/login.page.guard.service";
 
 const routes: Routes = [
   {path: '', redirectTo: '/home', pathMatch: 'full'},
@@ -22,13 +24,13 @@ const routes: Routes = [
   {path: 'product-list', component: ProductListPageComponent},
   {path: 'product-details/:id', component: ProductDetailsPageComponent},
   {path: 'cart', component: CartPageComponent},
-  {path: 'checkout', component: CheckoutPageComponent},
-  {path: 'checkout-summary', component: CheckoutSummaryPageComponent},
-  {path: 'order-confirmation', component: OrderConfirmationPageComponent},
-  {path: 'order-history', component: OrderHistoryPageComponent},
-  {path: 'order-history-details', component: OrderHistoryDetailsPageComponent},
-  {path: 'login-register', component: LoginRegisterPageComponent},
-  {path: 'edit-customer', component: EditCustomerDetailsPageComponent}
+  {path: 'checkout', component: CheckoutPageComponent, canActivate: [AuthGuardService]},
+  {path: 'checkout-summary', component: CheckoutSummaryPageComponent, canActivate: [AuthGuardService]},
+  {path: 'order-confirmation', component: OrderConfirmationPageComponent, canActivate: [AuthGuardService]},
+  {path: 'order-history', component: OrderHistoryPageComponent, canActivate: [AuthGuardService]},
+  {path: 'order-history-details', component: OrderHistoryDetailsPageComponent, canActivate: [AuthGuardService]},
+  {path: 'login-register', component: LoginRegisterPageComponent, canActivate: [LoginPageGuardService]},
+  {path: 'edit-customer', component: EditCustomerDetailsPageComponent, canActivate: [AuthGuardService]}
 ];
 
 @NgModule({

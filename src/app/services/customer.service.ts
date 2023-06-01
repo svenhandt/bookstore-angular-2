@@ -3,8 +3,10 @@ import {BehaviorSubject} from "rxjs";
 import {CustomerModel} from "../data/customer.model";
 import {
   ClientResponse,
-  Customer, CustomerSignin,
-  CustomerSignInResult, ErrorResponse, InvalidCredentialsError,
+  Customer,
+  CustomerSignin,
+  CustomerSignInResult,
+  InvalidCredentialsError,
   MyCustomerDraft,
   MyCustomerSignin
 } from "@commercetools/platform-sdk";
@@ -12,13 +14,15 @@ import {AddressModel} from "../data/address.model";
 import {CommercetoolsApiService} from "./infrastructure/commercetools.api.service";
 import {AbstractCommercetoolsService} from "./abstract/abstract.commercetools.service";
 import {CartService} from "./cart.service";
-import {Router} from "@angular/router";
-import {BadRequest} from "@commercetools/sdk-client-v2/dist/declarations/src/sdk-client/errors";
 
 const CURRENT_CUSTOMER = 'current_customer'
 
-export enum AuthenticationSuccess {
+export enum LoginSuccess {
   SUCCESS, WRONG_CREDENTIALS, UNKNOWN
+}
+
+export enum RegistrationSuccess {
+  SUCCESS, CUSTOMER_ALREADY_REGISTERED, UNKNOWN
 }
 
 @Injectable({
@@ -29,11 +33,16 @@ export class CustomerService extends AbstractCommercetoolsService {
   currentCustomerSubject = new BehaviorSubject<CustomerModel>(null)
   currentCustomer$ = this.currentCustomerSubject.asObservable()
 
-  loginSuccessSubject = new BehaviorSubject<AuthenticationSuccess>(AuthenticationSuccess.UNKNOWN)
+  loginSuccessSubject = new BehaviorSubject<LoginSuccess>(LoginSuccess.UNKNOWN)
   loginSuccess$ = this.loginSuccessSubject.asObservable()
 
   logoutSuccessSubject = new BehaviorSubject<boolean>(false)
   logoutSuccess$ = this.logoutSuccessSubject.asObservable()
+
+  registrationSuccessSubject = new BehaviorSubject<RegistrationSuccess>(RegistrationSuccess.UNKNOWN)
+  registrationSuccess$ = this.registrationSuccessSubject.asObservable()
+
+  checkoutLoginSubject = new BehaviorSubject<boolean>(false)
 
   constructor(commercetoolsApiService: CommercetoolsApiService,
               private cartService: CartService) {
@@ -66,7 +75,7 @@ export class CustomerService extends AbstractCommercetoolsService {
         this.handleLoginSuccess(body, customerSignin)
       })
       .catch((error: InvalidCredentialsError)  => {
-        this.loginSuccessSubject.next(AuthenticationSuccess.WRONG_CREDENTIALS)
+        this.loginSuccessSubject.next(LoginSuccess.WRONG_CREDENTIALS)
       })
   }
 
@@ -74,7 +83,7 @@ export class CustomerService extends AbstractCommercetoolsService {
     localStorage.removeItem(CURRENT_CUSTOMER)
     this.commercetoolsApiService.buildApiRoot()
     this.currentCustomerSubject.next(null)
-    this.loginSuccessSubject.next(AuthenticationSuccess.UNKNOWN)
+    this.loginSuccessSubject.next(LoginSuccess.UNKNOWN)
     this.logoutSuccessSubject.next(true)
     this.cartService.retrieveCurrentCart()
   }
@@ -91,11 +100,12 @@ export class CustomerService extends AbstractCommercetoolsService {
 
   private handleRegistrationSuccess(customerSignInResult: CustomerSignInResult, newCustomer: MyCustomerDraft) {
     this.handleAuthenticationSuccess(customerSignInResult, newCustomer.password)
+    this.registrationSuccessSubject.next(RegistrationSuccess.SUCCESS)
   }
 
   private handleLoginSuccess(customerSignInResult: CustomerSignInResult, customerSignin: CustomerSignin) {
     this.handleAuthenticationSuccess(customerSignInResult, customerSignin.password)
-    this.loginSuccessSubject.next(AuthenticationSuccess.SUCCESS)
+    this.loginSuccessSubject.next(LoginSuccess.SUCCESS)
   }
 
   private handleAuthenticationSuccess(customerSignInResult: CustomerSignInResult, password: string) {

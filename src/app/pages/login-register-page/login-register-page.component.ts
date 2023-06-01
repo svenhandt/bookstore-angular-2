@@ -2,7 +2,7 @@ import {Component, OnDestroy, OnInit, ViewChild} from '@angular/core';
 import {NgForm} from "@angular/forms";
 import {MyCustomerDraft, MyCustomerSignin} from "@commercetools/platform-sdk";
 import {CartService} from "../../services/cart.service";
-import {AuthenticationSuccess, CustomerService} from "../../services/customer.service";
+import {LoginSuccess, CustomerService} from "../../services/customer.service";
 import {ActivatedRoute, Router} from "@angular/router";
 import {Subscription} from "rxjs";
 
@@ -29,7 +29,7 @@ export class LoginRegisterPageComponent implements OnInit, OnDestroy {
 
   ngOnInit(): void {
     this.loginSuccessSubscription = this.customerService.loginSuccess$
-      .subscribe((authenticationSuccess: AuthenticationSuccess) => this.handleLoginSuccessSubscription(authenticationSuccess))
+      .subscribe((loginSuccess: LoginSuccess) => this.handleLoginSuccessSubscription(loginSuccess))
     this.logoutSuccessSubscription = this.customerService.logoutSuccess$.subscribe((logoutSuccess: boolean) => this.handleLogoutSuccessSubscription(logoutSuccess))
   }
 
@@ -47,7 +47,7 @@ export class LoginRegisterPageComponent implements OnInit, OnDestroy {
     if(this.registerForm && this.registerForm.value) {
       const customerToRegister = this.createCustomerToRegister()
       this.customerService.registerCustomer(customerToRegister)
-      this.router.navigate(['/'])
+      this.navigateToNextTarget()
     }
   }
 
@@ -66,14 +66,14 @@ export class LoginRegisterPageComponent implements OnInit, OnDestroy {
     }
   }
 
-  private handleLoginSuccessSubscription(authenticationSuccess: AuthenticationSuccess) {
-    if(authenticationSuccess === AuthenticationSuccess.SUCCESS) {
-      this.router.navigate(['/'])
+  private handleLoginSuccessSubscription(loginSuccess: LoginSuccess) {
+    if(loginSuccess === LoginSuccess.SUCCESS) {
+      this.navigateToNextTarget()
     }
-    if(authenticationSuccess === AuthenticationSuccess.WRONG_CREDENTIALS) {
+    if(loginSuccess === LoginSuccess.WRONG_CREDENTIALS) {
       this.showCredentialsError = true
     }
-    if(authenticationSuccess === AuthenticationSuccess.UNKNOWN) {
+    if(loginSuccess === LoginSuccess.UNKNOWN) {
       this.showCredentialsError = false
     }
   }
@@ -85,6 +85,18 @@ export class LoginRegisterPageComponent implements OnInit, OnDestroy {
         this.showLoggedOutMessage = false
         this.customerService.logoutSuccessSubject.next(false)
       }, 2000)
+    }
+  }
+
+  private navigateToNextTarget() {
+    console.log('navigating now!')
+    const isCheckoutLogin = this.customerService.checkoutLoginSubject.getValue()
+    if(isCheckoutLogin) {
+      this.customerService.checkoutLoginSubject.next(false)
+      this.router.navigate(['/checkout'])
+    }
+    else {
+      this.router.navigate(['/'])
     }
   }
 
@@ -120,7 +132,8 @@ export class LoginRegisterPageComponent implements OnInit, OnDestroy {
   }
 
   ngOnDestroy(): void {
-    this.customerService.loginSuccessSubject.next(AuthenticationSuccess.UNKNOWN)
+    this.customerService.loginSuccessSubject.next(LoginSuccess.UNKNOWN)
+    this.customerService.checkoutLoginSubject.next(false)
     if(this.loginSuccessSubscription) {
       this.loginSuccessSubscription.unsubscribe()
     }
