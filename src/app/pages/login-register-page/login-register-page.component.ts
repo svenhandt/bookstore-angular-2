@@ -2,8 +2,8 @@ import {Component, OnDestroy, OnInit, ViewChild} from '@angular/core';
 import {NgForm} from "@angular/forms";
 import {MyCustomerDraft, MyCustomerSignin} from "@commercetools/platform-sdk";
 import {CartService} from "../../services/cart.service";
-import {LoginSuccess, CustomerService} from "../../services/customer.service";
-import {ActivatedRoute, Router} from "@angular/router";
+import {CustomerService, LoginSuccess, RegistrationSuccess} from "../../services/customer.service";
+import {Router} from "@angular/router";
 import {Subscription} from "rxjs";
 
 @Component({
@@ -18,18 +18,22 @@ export class LoginRegisterPageComponent implements OnInit, OnDestroy {
 
   private loginSuccessSubscription: Subscription
   private logoutSuccessSubscription: Subscription
+  private registrationSuccessSubscription: Subscription
 
   showCredentialsError = false
+  showCustomerAlreadyRegisteredError = false
+  showAnotherRegistrationError = false
   showLoggedOutMessage = false
 
   constructor(private cartService: CartService,
               private customerService: CustomerService,
-              private router: Router,
-              private route: ActivatedRoute) { }
+              private router: Router) { }
 
   ngOnInit(): void {
     this.loginSuccessSubscription = this.customerService.loginSuccess$
       .subscribe((loginSuccess: LoginSuccess) => this.handleLoginSuccessSubscription(loginSuccess))
+    this.registrationSuccessSubscription = this.customerService.registrationSuccess$
+      .subscribe((registrationSuccess: RegistrationSuccess) => this.handleRegistrationSuccessSubscription(registrationSuccess))
     this.logoutSuccessSubscription = this.customerService.logoutSuccess$.subscribe((logoutSuccess: boolean) => this.handleLogoutSuccessSubscription(logoutSuccess))
   }
 
@@ -47,7 +51,6 @@ export class LoginRegisterPageComponent implements OnInit, OnDestroy {
     if(this.registerForm && this.registerForm.value) {
       const customerToRegister = this.createCustomerToRegister()
       this.customerService.registerCustomer(customerToRegister)
-      this.navigateToNextTarget()
     }
   }
 
@@ -75,6 +78,21 @@ export class LoginRegisterPageComponent implements OnInit, OnDestroy {
     }
     if(loginSuccess === LoginSuccess.UNKNOWN) {
       this.showCredentialsError = false
+    }
+  }
+
+  private handleRegistrationSuccessSubscription(registrationSuccess: RegistrationSuccess) {
+    if(registrationSuccess === RegistrationSuccess.SUCCESS) {
+      this.navigateToNextTarget()
+    }
+    if(registrationSuccess === RegistrationSuccess.CUSTOMER_ALREADY_REGISTERED) {
+      this.showCustomerAlreadyRegisteredError = true
+    }
+    if(registrationSuccess === RegistrationSuccess.OTHER_ERROR) {
+      this.showAnotherRegistrationError = true
+    }
+    if(registrationSuccess === RegistrationSuccess.UNKNOWN) {
+      this.showCustomerAlreadyRegisteredError = false
     }
   }
 
@@ -133,9 +151,13 @@ export class LoginRegisterPageComponent implements OnInit, OnDestroy {
 
   ngOnDestroy(): void {
     this.customerService.loginSuccessSubject.next(LoginSuccess.UNKNOWN)
+    this.customerService.registrationSuccessSubject.next(RegistrationSuccess.UNKNOWN)
     this.customerService.checkoutLoginSubject.next(false)
     if(this.loginSuccessSubscription) {
       this.loginSuccessSubscription.unsubscribe()
+    }
+    if(this.registrationSuccessSubscription) {
+      this.registrationSuccessSubscription.unsubscribe()
     }
     if(this.logoutSuccessSubscription) {
       this.logoutSuccessSubscription.unsubscribe()

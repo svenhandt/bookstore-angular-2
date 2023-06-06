@@ -52,6 +52,12 @@
         <h3>Registrieren</h3>
       </div>
       <div class="row login-register-form">
+        <div *ngIf="showAnotherRegistrationError" class="alert alert-danger alert-dismissible" role="alert">
+          Bei Ihrer Registrierung ist ein Fehler aufgetreten. Bitte entschuldigen Sie unsere Unfähigkeit.
+        </div>
+        <div *ngIf="showCustomerAlreadyRegisteredError" class="alert alert-danger alert-dismissible" role="alert">
+          Ein Kunde mit Ihrer angegebenen E-Mail-Adresse ist bereits registriert.
+        </div>
         <form (ngSubmit)="onRegister()"
               #registerForm="ngForm"
               [appMatchPassword]="['registerPassword', 'registerPasswordRepeat']">

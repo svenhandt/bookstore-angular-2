@@ -6,6 +6,7 @@ import {
   Customer,
   CustomerSignin,
   CustomerSignInResult,
+  ErrorResponse,
   InvalidCredentialsError,
   MyCustomerDraft,
   MyCustomerSignin
@@ -22,7 +23,7 @@ export enum LoginSuccess {
 }
 
 export enum RegistrationSuccess {
-  SUCCESS, CUSTOMER_ALREADY_REGISTERED, UNKNOWN
+  SUCCESS, CUSTOMER_ALREADY_REGISTERED, OTHER_ERROR, UNKNOWN
 }
 
 @Injectable({
@@ -60,7 +61,11 @@ export class CustomerService extends AbstractCommercetoolsService {
       )
       .execute()
       .then(({body}: ClientResponse<CustomerSignInResult>) => {
+        console.log(body)
         this.handleRegistrationSuccess(body, newCustomer)
+      })
+      .catch(({body}) => {
+        this.handleRegistrationFail(body)
       })
   }
 
@@ -100,11 +105,25 @@ export class CustomerService extends AbstractCommercetoolsService {
 
   private handleRegistrationSuccess(customerSignInResult: CustomerSignInResult, newCustomer: MyCustomerDraft) {
     this.handleAuthenticationSuccess(customerSignInResult, newCustomer.password)
+    this.cartService.retrieveCurrentCart()
     this.registrationSuccessSubject.next(RegistrationSuccess.SUCCESS)
+  }
+
+  handleRegistrationFail(errorResponse: ErrorResponse) {
+    const errorObjects = errorResponse.errors
+    for(const errorObject of errorObjects) {
+      if(errorObject.code === 'DuplicateField' && errorObject.field === 'email') {
+        this.registrationSuccessSubject.next(RegistrationSuccess.CUSTOMER_ALREADY_REGISTERED)
+      }
+      else {
+        this.registrationSuccessSubject.next(RegistrationSuccess.OTHER_ERROR)
+      }
+    }
   }
 
   private handleLoginSuccess(customerSignInResult: CustomerSignInResult, customerSignin: CustomerSignin) {
     this.handleAuthenticationSuccess(customerSignInResult, customerSignin.password)
+    this.cartService.retrieveCurrentCart()
     this.loginSuccessSubject.next(LoginSuccess.SUCCESS)
   }
 
@@ -114,7 +133,6 @@ export class CustomerService extends AbstractCommercetoolsService {
     localStorage.setItem(CURRENT_CUSTOMER, JSON.stringify(customer))
     this.commercetoolsApiService.buildApiRoot()
     this.currentCustomerSubject.next(customer)
-    this.cartService.retrieveCurrentCart()
   }
 
   private createCustomer(rawCustomer: Customer) {

@@ -6,6 +6,7 @@ import {CartEntryModel} from "../data/cartentry.model";
 import {Cart, ClientResponse, MyCartUpdateAction} from "@commercetools/platform-sdk";
 import {CommercetoolsApiService} from "./infrastructure/commercetools.api.service";
 import {AbstractCommercetoolsService} from "./abstract/abstract.commercetools.service";
+import {AddressModel} from "../data/address.model";
 
 @Injectable({
   providedIn: 'root'
@@ -25,20 +26,43 @@ export class CartService extends AbstractCommercetoolsService {
   }
 
   addToCart(product: ProductModel) {
-    this.updateCart({
+    this.updateCart([{
       action: 'addLineItem',
       productId: product.id
-    })
+    }])
   }
 
   removeFromCart(cartEntry: CartEntryModel) {
-    this.updateCart({
+    this.updateCart([{
       action: 'removeLineItem',
       lineItemId: cartEntry.id
-    })
+    }])
   }
 
-  private updateCart(updateAction: MyCartUpdateAction) {
+  setBillingAndShippingAddress(address: AddressModel) {
+    const billingAndShippingddress = {
+      id: address.id,
+      country: address.country,
+      firstName: address.firstName,
+      lastName: address.lastName,
+      streetName: address.street,
+      streetNumber: address.streetNumber,
+      postalCode: address.zipCode,
+      city: address.town
+    }
+    this.updateCart([
+      {
+        action: 'setBillingAddress',
+        address: billingAndShippingddress
+      },
+      {
+        action: 'setShippingAddress',
+        address: billingAndShippingddress
+      }
+    ])
+  }
+
+  private updateCart(updateActions: MyCartUpdateAction[]) {
     const currentCart = this.cartSubject.getValue()
     if(currentCart) {
       const id = currentCart.id
@@ -51,9 +75,7 @@ export class CartService extends AbstractCommercetoolsService {
           .post({
             body: {
               version: version,
-              actions: [
-                updateAction
-              ]
+              actions: updateActions
             }
           })
           .execute()
