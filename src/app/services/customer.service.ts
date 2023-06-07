@@ -105,7 +105,8 @@ export class CustomerService extends AbstractCommercetoolsService {
 
   private handleRegistrationSuccess(customerSignInResult: CustomerSignInResult, newCustomer: MyCustomerDraft) {
     this.handleAuthenticationSuccess(customerSignInResult, newCustomer.password)
-    this.cartService.retrieveCurrentCart()
+    const customer = this.currentCustomerSubject.getValue()
+    this.cartService.setBillingAndShippingAddress(customer.address)
     this.registrationSuccessSubject.next(RegistrationSuccess.SUCCESS)
   }
 
@@ -123,7 +124,6 @@ export class CustomerService extends AbstractCommercetoolsService {
 
   private handleLoginSuccess(customerSignInResult: CustomerSignInResult, customerSignin: CustomerSignin) {
     this.handleAuthenticationSuccess(customerSignInResult, customerSignin.password)
-    this.cartService.retrieveCurrentCart()
     this.loginSuccessSubject.next(LoginSuccess.SUCCESS)
   }
 
@@ -133,6 +133,7 @@ export class CustomerService extends AbstractCommercetoolsService {
     localStorage.setItem(CURRENT_CUSTOMER, JSON.stringify(customer))
     this.commercetoolsApiService.buildApiRoot()
     this.currentCustomerSubject.next(customer)
+    this.cartService.setCurrentCart(customerSignInResult.cart)
   }
 
   private createCustomer(rawCustomer: Customer) {

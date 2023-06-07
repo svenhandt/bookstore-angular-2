@@ -1,4 +1,5 @@
 import { Injectable } from '@angular/core';
+import {BehaviorSubject} from "rxjs";
 
 @Injectable({
   providedIn: 'root'
@@ -7,15 +8,16 @@ export class CurrentPageService {
 
   constructor() { }
 
-  private currentComponentName: string | undefined
+  private currentComponentNameSubject = new BehaviorSubject<string>(null)
+  currentComponentName$ = this.currentComponentNameSubject.asObservable()
 
-  setCurrentComponentName(name: string | undefined) {
-    this.currentComponentName = name
+  setCurrentComponentName(name: string) {
+    this.currentComponentNameSubject.next(name)
   }
 
-  isCheckoutPage() {
+  isCheckoutPage(componentName: string) {
     let isCheckoutPage = false
-    if(this.currentComponentName && this.containsPagesForCheckout(this.currentComponentName)) {
+    if(componentName && this.containsPagesForCheckout(componentName)) {
       isCheckoutPage = true
     }
     return isCheckoutPage

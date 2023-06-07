@@ -3,7 +3,7 @@ import {CartModel} from "../data/cart.model";
 import {BehaviorSubject} from "rxjs";
 import {ProductModel} from "../data/product.model";
 import {CartEntryModel} from "../data/cartentry.model";
-import {Cart, ClientResponse, MyCartUpdateAction} from "@commercetools/platform-sdk";
+import {Attribute, Cart, ClientResponse, LineItem, MyCartUpdateAction, Price} from "@commercetools/platform-sdk";
 import {CommercetoolsApiService} from "./infrastructure/commercetools.api.service";
 import {AbstractCommercetoolsService} from "./abstract/abstract.commercetools.service";
 import {AddressModel} from "../data/address.model";
@@ -13,7 +13,7 @@ import {AddressModel} from "../data/address.model";
 })
 export class CartService extends AbstractCommercetoolsService {
 
-  cartSubject = new BehaviorSubject<CartModel>(new CartModel())
+  private cartSubject = new BehaviorSubject<CartModel>(new CartModel())
   currentCart$ = this.cartSubject.asObservable()
 
   constructor(@Inject(LOCALE_ID) private locale: string,
@@ -37,6 +37,10 @@ export class CartService extends AbstractCommercetoolsService {
       action: 'removeLineItem',
       lineItemId: cartEntry.id
     }])
+  }
+
+  setCurrentCart(rawCart: Cart) {
+    this.buildCartAndNext(rawCart)
   }
 
   setBillingAndShippingAddress(address: AddressModel) {
@@ -93,7 +97,6 @@ export class CartService extends AbstractCommercetoolsService {
       .get()
       .execute()
       .then(({body}: any) => {
-        console.log(body)
         this.buildCartAndNext(body)
       })
       .catch(this.createCart.bind(this))
@@ -114,19 +117,21 @@ export class CartService extends AbstractCommercetoolsService {
       })
   }
 
-  private buildCartAndNext(body: any) {
+  private buildCartAndNext(rawCart: Cart) {
     const cart = new CartModel()
-    cart.id = body.id
-    cart.version = body.version
-    cart.customerId = body.anonymousId
-    this.buildCartEntries(cart, body)
-    cart.totalPrice = this.getPriceAmount(body.totalPrice)
+    cart.id = rawCart.id
+    cart.version = rawCart.version
+    cart.customerId = rawCart.anonymousId
+    this.buildCartEntries(cart, rawCart)
+    this.buildDeliveryAddress(cart, rawCart)
+    cart.totalPrice = this.getPriceAmount(rawCart.totalPrice)
+    this.setTotalTax(cart, rawCart)
     console.log(cart)
     this.cartSubject.next(cart)
   }
 
-  private buildCartEntries(cart: CartModel, body: any) {
-    const lineItems: any[] = body.lineItems
+  private buildCartEntries(cart: CartModel, rawCart: Cart) {
+    const lineItems: LineItem[] = rawCart.lineItems
     if(lineItems) {
       for(const lineItem of lineItems) {
         const cartEntry : CartEntryModel = new CartEntryModel()
@@ -139,8 +144,24 @@ export class CartService extends AbstractCommercetoolsService {
     }
   }
 
+  private buildDeliveryAddress(cart: CartModel, rawCart: Cart) {
+    const rawDeliveryAddress = rawCart.shippingAddress
+    if(rawDeliveryAddress) {
+      const deliveryAddress = new AddressModel()
+      deliveryAddress.id = rawDeliveryAddress.id
+      deliveryAddress.country = rawDeliveryAddress.country
+      deliveryAddress.firstName = rawDeliveryAddress.firstName
+      deliveryAddress.lastName = rawDeliveryAddress.lastName
+      deliveryAddress.street = rawDeliveryAddress.streetName
+      deliveryAddress.streetNumber = rawDeliveryAddress.streetNumber
+      deliveryAddress.zipCode = rawDeliveryAddress.postalCode
+      deliveryAddress.town = rawDeliveryAddress.city
+      cart.deliveryAddress = deliveryAddress
+    }
+  }
 
-  private setProductForCartEntry(cartEntry: CartEntryModel, lineItem: any) {
+
+  private setProductForCartEntry(cartEntry: CartEntryModel, lineItem: LineItem) {
     const product = new ProductModel()
     product.id = lineItem.productId
     product.name = lineItem.name[this.locale]
@@ -151,9 +172,10 @@ export class CartService extends AbstractCommercetoolsService {
     cartEntry.product = product
   }
 
-  private setAuthor(product: ProductModel, lineItem: any) {
+  private setAuthor(product: ProductModel, lineItem: LineItem) {
     if(lineItem.variant) {
-      const authorData = lineItem.variant.attributes.find((attribute: any) => {
+      lineItem.variant.attributes
+      const authorData = lineItem.variant.attributes.find((attribute: Attribute) => {
         return attribute.name === 'author'
       })
       if (authorData) {
@@ -162,9 +184,9 @@ export class CartService extends AbstractCommercetoolsService {
     }
   }
 
-  private setIsbn(product: ProductModel, lineItem: any) {
+  private setIsbn(product: ProductModel, lineItem: LineItem) {
     if(lineItem.variant) {
-      const isbnData = lineItem.variant.attributes.find((attribute: any) => {
+      const isbnData = lineItem.variant.attributes.find((attribute: Attribute) => {
         return attribute.name === 'isbn'
       })
       if (isbnData) {
@@ -173,7 +195,7 @@ export class CartService extends AbstractCommercetoolsService {
     }
   }
 
-  private setImage(product: ProductModel, lineItem: any) {
+  private setImage(product: ProductModel, lineItem: LineItem) {
     if(lineItem.variant) {
       const images = lineItem.variant.images
       if (images && images.length > 0) {
@@ -196,6 +218,16 @@ export class CartService extends AbstractCommercetoolsService {
       }
     }
     return priceVal
+  }
+
+  private setTotalTax(cart: CartModel, rawCart: Cart) {
+    const rawTaxedPrice = rawCart.taxedPrice
+    if(rawTaxedPrice) {
+      const rawTotalTax = rawTaxedPrice.totalTax
+      if(rawTotalTax && rawTotalTax.centAmount) {
+        cart.totalTax = rawTotalTax.centAmount / 100
+      }
+    }
   }
 
 }

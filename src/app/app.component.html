@@ -1,2 +1,3 @@
-<app-header *ngIf="!isCheckoutPage()"></app-header>
+<app-header *ngIf="!isCheckoutPage(currentComponentName$ | async)"></app-header>
+<app-small-header *ngIf="isCheckoutPage(currentComponentName$ | async)"></app-small-header>
 <router-outlet></router-outlet>
