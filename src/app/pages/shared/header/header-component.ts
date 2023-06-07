@@ -8,12 +8,14 @@ import {CartModel} from "../../../data/cart.model";
 import {Category} from "@commercetools/platform-sdk";
 import {CustomerService} from "../../../services/customer.service";
 import {CustomerModel} from "../../../data/customer.model";
+import {CurrentPageService} from "../../../services/infrastructure/current-page.service";
 
 interface HeaderComponentData {
   categories: Category[]
   selectedCategory: Category
   currentCart: CartModel
   currentCustomer: CustomerModel
+  onCheckoutPage: boolean
 }
 
 @Component({
@@ -34,6 +36,7 @@ export class HeaderComponent implements OnInit {
   constructor(private categoryService: CategoryService,
               private cartService: CartService,
               private customerService: CustomerService,
+              private currentPageService: CurrentPageService,
               private router: Router) { }
 
   ngOnInit(): void {
@@ -49,14 +52,18 @@ export class HeaderComponent implements OnInit {
     const currentCustomer$ = this.customerService.currentCustomer$.pipe(
       startWith(null)
     )
-    this.headerComponentData$ = combineLatest([categories$, selectedCategory$, currentCart$, currentCustomer$])
+    const onCheckoutPage$ = this.currentPageService.isCheckoutPage$.pipe(
+      startWith(false)
+    )
+    this.headerComponentData$ = combineLatest([categories$, selectedCategory$, currentCart$, currentCustomer$, onCheckoutPage$])
       .pipe(
-        map(([categories, selectedCategory, currentCart, currentCustomer]) => {
+        map(([categories, selectedCategory, currentCart, currentCustomer, onCheckoutPage]) => {
           return {
             categories: categories,
             selectedCategory: selectedCategory,
             currentCart: currentCart,
-            currentCustomer: currentCustomer
+            currentCustomer: currentCustomer,
+            onCheckoutPage: onCheckoutPage
           }
         })
       )

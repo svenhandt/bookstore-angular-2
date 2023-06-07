@@ -1,4 +1,6 @@
 import { Component, OnInit } from '@angular/core';
+import {CurrentPageService} from "../../../services/infrastructure/current-page.service";
+import {Observable} from "rxjs";
 
 @Component({
   selector: 'app-small-header',
@@ -7,9 +9,12 @@ import { Component, OnInit } from '@angular/core';
 })
 export class SmallHeaderComponent implements OnInit {
 
-  constructor() { }
+  isCheckoutPage$: Observable<boolean>
+
+  constructor(private currentPageService: CurrentPageService) { }
 
   ngOnInit(): void {
+    this.isCheckoutPage$ = this.currentPageService.isCheckoutPage$
   }
 
 }

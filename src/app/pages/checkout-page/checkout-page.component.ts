@@ -14,11 +14,11 @@ export class CheckoutPageComponent implements OnInit, OnDestroy {
   constructor(private currentPageService: CurrentPageService) { }
 
   ngOnInit(): void {
-    this.currentPageService.setCurrentComponentName('CheckoutPageComponent')
+    this.currentPageService.setIsCheckoutPage(true)
   }
 
   ngOnDestroy(): void {
-    this.currentPageService.setCurrentComponentName(null)
+    this.currentPageService.setIsCheckoutPage(false)
   }
 
 }

@@ -49,7 +49,6 @@ export class ProductListPageComponent implements OnInit, OnDestroy {
     else {
       this.subscribeToParamsCategoriesNotLoaded()
     }
-    this.currentPageService.setCurrentComponentName(this.route.component?.name)
   }
 
   private loadProducts() {

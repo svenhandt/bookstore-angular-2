@@ -1,79 +1,81 @@
 <ng-container *ngIf="(headerComponentData$ | async) as headerComponentData">
-  <div class="container">
-    <div class="shop-headline row justify-content-center">
-      <h1>Commercetools Bookstore</h1>
-      <p *ngIf="headerComponentData.currentCustomer">angemeldet als: {{headerComponentData.currentCustomer.firstName}} {{headerComponentData.currentCustomer.lastName}}</p>
-    </div>
-  </div>
-  <nav class="bookstore navbar navbar-expand-lg">
-    <div class="container-fluid">
-      <div class="collapse navbar-collapse" id="navbarSupportedContent">
-        <ul class="navbar-nav me-auto mb-2 mb-lg-0">
-          <li class="nav-item">
-            <a class="nav-link" aria-current="page" routerLink="/home" routerLinkActive="active" (click)="resetSelectedCategory()">Startseite</a>
-          </li>
-          <li class="nav-item" *ngFor="let category of headerComponentData.categories">
-            <a [ngClass]="['nav-link', headerComponentData.selectedCategory && category.key === headerComponentData.selectedCategory.key ? 'active' : '']"
-               style="cursor: pointer;"
-               (click)="onNavigateToCategory(category)">
-              {{category.name | localized}}
-            </a>
-          </li>
-          <li class="nav-item dropdown" *ngIf="headerComponentData.currentCustomer">
-            <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-              Mein Konto
-            </a>
-            <ul class="dropdown-menu">
-              <li><a class="dropdown-item" href="#">Meine Daten</a></li>
-              <li><a class="dropdown-item" href="#">Meine Bestellungen</a></li>
-              <li>
-                <a class="dropdown-item"
-                     style="cursor: pointer"
-                     (click)="onLogout()">
-                Logout
-                </a>
-              </li>
-            </ul>
-          </li>
-          <li class="nav-item" *ngIf="!headerComponentData.currentCustomer">
-            <a class="nav-link"
-               style="cursor: pointer"
-               routerLink="/login-register"
-               routerLinkActive="active"
-               (click)="resetSelectedCategory()">Login/Registrierung</a>
-          </li>
-        </ul>
-        <ul class="navbar-nav">
-          <li class="nav-link">
-            <a class="nav-link "
-               style="cursor: pointer"
-               routerLink="/cart"
-               routerLinkActive="active"
-               (click)="resetSelectedCategory()">
-              <i-bs width="2rem" height="2rem" name="cart"></i-bs>&nbsp;
-              {{getCurrentCartLength(headerComponentData.currentCart) === 0 ? '' : '(' + getCurrentCartLength(headerComponentData.currentCart) + ')'}}
-            </a>
-          </li>
-        </ul>
-        <form
-          class="d-flex"
-          role="search"
-          (ngSubmit)="onSubmitSearchForm()"
-          #searchForm="ngForm">
-          <input
-            class="form-control me-2"
-            type="search"
-            placeholder="Suche"
-            aria-label="Suche"
-            name="searchInput"
-            ngModel>
-          <button
-            class="btn btn-primary"
-            type="submit">
-            Suche
-          </button>
-        </form>
+  <ng-container *ngIf="!headerComponentData.onCheckoutPage">
+    <div class="container">
+      <div class="shop-headline row justify-content-center">
+        <h1>Commercetools Bookstore</h1>
+        <p *ngIf="headerComponentData.currentCustomer">angemeldet als: {{headerComponentData.currentCustomer.firstName}} {{headerComponentData.currentCustomer.lastName}}</p>
       </div>
     </div>
-  </nav>
+    <nav class="bookstore navbar navbar-expand-lg">
+      <div class="container-fluid">
+        <div class="collapse navbar-collapse" id="navbarSupportedContent">
+          <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+            <li class="nav-item">
+              <a class="nav-link" aria-current="page" routerLink="/home" routerLinkActive="active" (click)="resetSelectedCategory()">Startseite</a>
+            </li>
+            <li class="nav-item" *ngFor="let category of headerComponentData.categories">
+              <a [ngClass]="['nav-link', headerComponentData.selectedCategory && category.key === headerComponentData.selectedCategory.key ? 'active' : '']"
+                 style="cursor: pointer;"
+                 (click)="onNavigateToCategory(category)">
+                {{category.name | localized}}
+              </a>
+            </li>
+            <li class="nav-item dropdown" *ngIf="headerComponentData.currentCustomer">
+              <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                Mein Konto
+              </a>
+              <ul class="dropdown-menu">
+                <li><a class="dropdown-item" href="#">Meine Daten</a></li>
+                <li><a class="dropdown-item" href="#">Meine Bestellungen</a></li>
+                <li>
+                  <a class="dropdown-item"
+                     style="cursor: pointer"
+                     (click)="onLogout()">
+                    Logout
+                  </a>
+                </li>
+              </ul>
+            </li>
+            <li class="nav-item" *ngIf="!headerComponentData.currentCustomer">
+              <a class="nav-link"
+                 style="cursor: pointer"
+                 routerLink="/login-register"
+                 routerLinkActive="active"
+                 (click)="resetSelectedCategory()">Login/Registrierung</a>
+            </li>
+          </ul>
+          <ul class="navbar-nav">
+            <li class="nav-link">
+              <a class="nav-link "
+                 style="cursor: pointer"
+                 routerLink="/cart"
+                 routerLinkActive="active"
+                 (click)="resetSelectedCategory()">
+                <i-bs width="2rem" height="2rem" name="cart"></i-bs>&nbsp;
+                {{getCurrentCartLength(headerComponentData.currentCart) === 0 ? '' : '(' + getCurrentCartLength(headerComponentData.currentCart) + ')'}}
+              </a>
+            </li>
+          </ul>
+          <form
+            class="d-flex"
+            role="search"
+            (ngSubmit)="onSubmitSearchForm()"
+            #searchForm="ngForm">
+            <input
+              class="form-control me-2"
+              type="search"
+              placeholder="Suche"
+              aria-label="Suche"
+              name="searchInput"
+              ngModel>
+            <button
+              class="btn btn-primary"
+              type="submit">
+              Suche
+            </button>
+          </form>
+        </div>
+      </div>
+    </nav>
+  </ng-container>
 </ng-container>

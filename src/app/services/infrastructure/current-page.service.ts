@@ -6,25 +6,14 @@ import {BehaviorSubject} from "rxjs";
 })
 export class CurrentPageService {
 
+  private isCheckoutPageSubject = new BehaviorSubject<boolean>(false)
+  isCheckoutPage$ = this.isCheckoutPageSubject.asObservable()
+
   constructor() { }
 
-  private currentComponentNameSubject = new BehaviorSubject<string>(null)
-  currentComponentName$ = this.currentComponentNameSubject.asObservable()
-
-  setCurrentComponentName(name: string) {
-    this.currentComponentNameSubject.next(name)
+  setIsCheckoutPage(value: boolean) {
+    this.isCheckoutPageSubject.next(value)
   }
 
-  isCheckoutPage(componentName: string) {
-    let isCheckoutPage = false
-    if(componentName && this.containsPagesForCheckout(componentName)) {
-      isCheckoutPage = true
-    }
-    return isCheckoutPage
-  }
-
-  private containsPagesForCheckout(name: string) {
-    return name === 'CheckoutPageComponent' || name === 'CheckoutSummaryPageComponent'
-  }
 
 }
