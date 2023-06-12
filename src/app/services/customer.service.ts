@@ -93,6 +93,10 @@ export class CustomerService extends AbstractCommercetoolsService {
     this.cartService.retrieveCurrentCart()
   }
 
+  addPaymentInfo() {
+
+  }
+
   private initCurrentCustomer() {
     const currentCustomerStr = localStorage.getItem(CURRENT_CUSTOMER)
     if(currentCustomerStr) {
@@ -110,7 +114,7 @@ export class CustomerService extends AbstractCommercetoolsService {
     this.registrationSuccessSubject.next(RegistrationSuccess.SUCCESS)
   }
 
-  handleRegistrationFail(errorResponse: ErrorResponse) {
+  private handleRegistrationFail(errorResponse: ErrorResponse) {
     const errorObjects = errorResponse.errors
     for(const errorObject of errorObjects) {
       if(errorObject.code === 'DuplicateField' && errorObject.field === 'email') {

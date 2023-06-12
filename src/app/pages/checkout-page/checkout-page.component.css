@@ -28,3 +28,10 @@
 .checkout-buttons button {
   margin-top: 10px;
 }
+
+p.alert-danger {
+  font-size: 12px;
+  margin-top: 5px;
+  padding-top: 3px;
+  padding-bottom: 3px;
+}

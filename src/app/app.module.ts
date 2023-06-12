@@ -23,6 +23,7 @@ import localeDe from '@angular/common/locales/de';
 import {FormsModule} from "@angular/forms";
 import { LocalizedPipe } from './pipes/localized.pipe';
 import { MatchPasswordDirective } from './directives/match-password.directive';
+import {ExpiryDateDirective} from "./pages/checkout-page/expiry-date.directive";
 
 registerLocaleData(localeDe)
 
@@ -45,6 +46,7 @@ registerLocaleData(localeDe)
     CheckoutFooterComponent,
     LocalizedPipe,
     MatchPasswordDirective,
+    ExpiryDateDirective
   ],
   imports: [
     BrowserModule,
