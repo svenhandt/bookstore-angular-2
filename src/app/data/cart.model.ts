@@ -1,5 +1,6 @@
 import {CartEntryModel} from "./cartentry.model";
 import {AddressModel} from "./address.model";
+import {Money} from "@commercetools/platform-sdk";
 
 export class CartModel {
 
@@ -8,6 +9,7 @@ export class CartModel {
   customerId: string
   entries : CartEntryModel[] = []
   deliveryAddress: AddressModel
+  totalPriceAsMoney: Money
   totalPrice: number
   totalTax: number
 

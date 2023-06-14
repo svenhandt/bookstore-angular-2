@@ -80,6 +80,7 @@ export class CommercetoolsApiService {
 
   private getAnonymousSessionFlowMiddleware() {
     CommercetoolsApiService.clearTokenCache()
+    localStorage.removeItem('session_payment_info')
     const anonymousAuthMiddlewareOptions: AnonymousAuthMiddlewareOptions = {
       host: environment.authHost,
       projectKey: environment.projectKey,

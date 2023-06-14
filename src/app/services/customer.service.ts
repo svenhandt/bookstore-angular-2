@@ -7,9 +7,9 @@ import {
   CustomerSignin,
   CustomerSignInResult,
   ErrorResponse,
-  InvalidCredentialsError,
+  InvalidCredentialsError, Money,
   MyCustomerDraft,
-  MyCustomerSignin
+  MyCustomerSignin, MyPayment, MyPaymentDraft
 } from "@commercetools/platform-sdk";
 import {AddressModel} from "../data/address.model";
 import {CommercetoolsApiService} from "./infrastructure/commercetools.api.service";
@@ -91,10 +91,6 @@ export class CustomerService extends AbstractCommercetoolsService {
     this.loginSuccessSubject.next(LoginSuccess.UNKNOWN)
     this.logoutSuccessSubject.next(true)
     this.cartService.retrieveCurrentCart()
-  }
-
-  addPaymentInfo() {
-
   }
 
   private initCurrentCustomer() {

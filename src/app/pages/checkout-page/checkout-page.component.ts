@@ -5,6 +5,8 @@ import {Observable} from "rxjs";
 import {CartModel} from "../../data/cart.model";
 import {NgForm} from "@angular/forms";
 import {MyPaymentDraft} from "@commercetools/platform-sdk";
+import {CustomerService} from "../../services/customer.service";
+import {PaymentService} from "../../services/payment.service";
 
 @Component({
   selector: 'app-checkout-page',
@@ -21,7 +23,8 @@ export class CheckoutPageComponent implements OnInit, OnDestroy {
   currentCart$: Observable<CartModel>
 
   constructor(private currentPageService: CurrentPageService,
-              private cartService: CartService) { }
+              private cartService: CartService,
+              private paymentService: PaymentService) { }
 
   ngOnInit(): void {
     this.currentPageService.setIsCheckoutPage(true)
@@ -29,12 +32,10 @@ export class CheckoutPageComponent implements OnInit, OnDestroy {
   }
 
   onSubmitCreditCardForm(currentCart: CartModel) {
-    /*
-    const paymentDraft: MyPaymentDraft = {
-      amountPlanned:
+    const totalPriceAsMoney = currentCart.totalPriceAsMoney
+    if(totalPriceAsMoney) {
+      this.paymentService.addOrUpdatePaymentInfo(totalPriceAsMoney)
     }
-
-     */
   }
 
   onResetCreditCardForm() {

@@ -3,7 +3,7 @@ import {CartModel} from "../data/cart.model";
 import {BehaviorSubject} from "rxjs";
 import {ProductModel} from "../data/product.model";
 import {CartEntryModel} from "../data/cartentry.model";
-import {Attribute, Cart, ClientResponse, LineItem, MyCartUpdateAction, Price} from "@commercetools/platform-sdk";
+import {Attribute, Cart, ClientResponse, LineItem, MyCartUpdateAction} from "@commercetools/platform-sdk";
 import {CommercetoolsApiService} from "./infrastructure/commercetools.api.service";
 import {AbstractCommercetoolsService} from "./abstract/abstract.commercetools.service";
 import {AddressModel} from "../data/address.model";
@@ -124,7 +124,7 @@ export class CartService extends AbstractCommercetoolsService {
     cart.customerId = rawCart.anonymousId
     this.buildCartEntries(cart, rawCart)
     this.buildDeliveryAddress(cart, rawCart)
-    cart.totalPrice = this.getPriceAmount(rawCart.totalPrice)
+    this.setTotalPrice(cart, rawCart)
     this.setTotalTax(cart, rawCart)
     console.log(cart)
     this.cartSubject.next(cart)
@@ -138,7 +138,7 @@ export class CartService extends AbstractCommercetoolsService {
         cartEntry.id = lineItem.id
         this.setProductForCartEntry(cartEntry, lineItem)
         cartEntry.quantity = lineItem.quantity
-        cartEntry.entryTotalPrice = this.getPriceAmount(lineItem.totalPrice)
+        this.setEntryTotalPrice(cartEntry, lineItem)
         cart.entries.push(cartEntry)
       }
     }
@@ -165,7 +165,7 @@ export class CartService extends AbstractCommercetoolsService {
     const product = new ProductModel()
     product.id = lineItem.productId
     product.name = lineItem.name[this.locale]
-    product.price = this.getPriceAmount(lineItem.price)
+    this.setEntryProductPrice(product, lineItem)
     this.setAuthor(product, lineItem)
     this.setIsbn(product, lineItem)
     this.setImage(product, lineItem)
@@ -204,20 +204,34 @@ export class CartService extends AbstractCommercetoolsService {
     }
   }
 
-  private getPriceAmount(priceObj: any) {
-    let priceVal: number = 0
-    if(priceObj) {
-      if(priceObj.value) {
-        const priceValueObj = priceObj.value
-        if(priceValueObj && priceValueObj.centAmount) {
-          priceVal = priceValueObj.centAmount / 100
+  private setEntryTotalPrice(cartEntry: CartEntryModel, lineItem: LineItem) {
+    const rawTotalEntryPrice = lineItem.totalPrice
+    if(rawTotalEntryPrice && rawTotalEntryPrice.centAmount) {
+      cartEntry.entryTotalPrice = rawTotalEntryPrice.centAmount / 100
+    }
+  }
+
+  private setEntryProductPrice(product: ProductModel, lineItem: LineItem) {
+    const rawProductPrice = lineItem.price
+    const rawPriceValue = rawProductPrice.value
+    if(rawPriceValue && rawPriceValue.centAmount) {
+      product.price = rawPriceValue.centAmount / 100
+    }
+  }
+
+  private setTotalPrice(cart: CartModel, rawCart: Cart) {
+    const rawTotalPrice = rawCart.totalPrice
+    if(rawTotalPrice) {
+      const centAmount = rawTotalPrice.centAmount
+      const currencyCode = rawTotalPrice.currencyCode
+      if(centAmount && currencyCode) {
+        cart.totalPrice = centAmount / 100
+        cart.totalPriceAsMoney = {
+          centAmount: centAmount,
+          currencyCode: currencyCode
         }
       }
-      else if(priceObj.centAmount) {
-        priceVal = priceObj.centAmount / 100
-      }
     }
-    return priceVal
   }
 
   private setTotalTax(cart: CartModel, rawCart: Cart) {

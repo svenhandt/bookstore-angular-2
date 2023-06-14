@@ -25,6 +25,7 @@
     "@commercetools/sdk-client": "^3.0.0",
     "@commercetools/sdk-client-v2": "^2.1.5",
     "@popperjs/core": "^2.11.7",
+    "@types/dinero.js": "^1.9.0",
     "bootstrap": "^5.2.3",
     "bootstrap-icons": "^1.10.4",
     "buffer": "^6.0.3",
