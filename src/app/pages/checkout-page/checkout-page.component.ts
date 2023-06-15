@@ -1,12 +1,11 @@
 import {Component, OnDestroy, OnInit, ViewChild} from '@angular/core';
 import {CurrentPageService} from "../../services/infrastructure/current-page.service";
 import {CartService} from "../../services/cart.service";
-import {Observable} from "rxjs";
+import {Observable, Subscription} from "rxjs";
 import {CartModel} from "../../data/cart.model";
 import {NgForm} from "@angular/forms";
-import {MyPaymentDraft} from "@commercetools/platform-sdk";
-import {CustomerService} from "../../services/customer.service";
 import {PaymentService} from "../../services/payment.service";
+import {Router} from "@angular/router";
 
 @Component({
   selector: 'app-checkout-page',
@@ -22,19 +21,27 @@ export class CheckoutPageComponent implements OnInit, OnDestroy {
 
   currentCart$: Observable<CartModel>
 
+  private paymentUpdatedSubscription: Subscription
+
   constructor(private currentPageService: CurrentPageService,
               private cartService: CartService,
-              private paymentService: PaymentService) { }
+              private paymentService: PaymentService,
+              private router: Router) { }
 
   ngOnInit(): void {
     this.currentPageService.setIsCheckoutPage(true)
     this.currentCart$ = this.cartService.currentCart$
+    this.paymentUpdatedSubscription = this.paymentService.paymentUpdated$.subscribe((paymentUpdated: boolean) => {
+      if(paymentUpdated) {
+        this.router.navigate(['/checkout-summary'])
+      }
+    })
   }
 
   onSubmitCreditCardForm(currentCart: CartModel) {
     const totalPriceAsMoney = currentCart.totalPriceAsMoney
     if(totalPriceAsMoney) {
-      this.paymentService.addOrUpdatePaymentInfo(totalPriceAsMoney)
+      this.paymentService.addOrChangeAmountInPaymentInfo(totalPriceAsMoney)
     }
   }
 
@@ -44,6 +51,10 @@ export class CheckoutPageComponent implements OnInit, OnDestroy {
 
   ngOnDestroy(): void {
     this.currentPageService.setIsCheckoutPage(false)
+    this.paymentService.resetPaymentUpdated()
+    if(this.paymentUpdatedSubscription) {
+      this.paymentUpdatedSubscription.unsubscribe()
+    }
   }
 
 }

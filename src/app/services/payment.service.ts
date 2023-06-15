@@ -5,7 +5,7 @@ import {
   ClientResponse,
   Money,
   MyPayment,
-  MyPaymentDraft,
+  MyPaymentDraft, MyPaymentUpdateAction,
   PaymentMethodInfo
 } from "@commercetools/platform-sdk";
 import {BehaviorSubject} from "rxjs";
@@ -22,18 +22,49 @@ export class PaymentService extends AbstractCommercetoolsService {
     super(commercetoolsApiService)
   }
 
-  addOrUpdatePaymentInfo(paymentAmount: Money) {
+  addOrChangeAmountInPaymentInfo(paymentAmount: Money) {
     const myPaymentAsStr = localStorage.getItem('session_payment_info')
     if(myPaymentAsStr) {
       const myPayment = JSON.parse(myPaymentAsStr) as MyPayment
-      this.updatePaymentInfo(myPayment, paymentAmount)
+      this.changeAmountInPaymentInfo(myPayment, paymentAmount)
     }
     else {
       this.addPaymentInfo(paymentAmount)
     }
   }
 
-  private updatePaymentInfo(myPayment: MyPayment, paymentAmount: Money) {
+  addChargeTransactionToPaymentInfo() {
+    const myPaymentAsStr = localStorage.getItem('session_payment_info')
+    if(myPaymentAsStr) {
+      const myPayment = JSON.parse(myPaymentAsStr) as MyPayment
+      const addChargeTransactionAction: MyPaymentUpdateAction = {
+        action: "addTransaction",
+        transaction: {
+          type: "Authorization",
+          amount: myPayment.amountPlanned
+        }
+      }
+      this.updatePaymentInfo(myPayment, [addChargeTransactionAction])
+    }
+  }
+
+  checkHasPaymentInfo() {
+    return !!localStorage.getItem('session_payment_info')
+  }
+
+  resetPaymentUpdated() {
+    this.paymentUpdatedSubject.next(false)
+  }
+
+  private changeAmountInPaymentInfo(myPayment: MyPayment, paymentAmount: Money) {
+    const changeAmountInPaymentInfoAction: MyPaymentUpdateAction = {
+      action: 'changeAmountPlanned',
+      amount: paymentAmount
+    }
+    this.updatePaymentInfo(myPayment, [changeAmountInPaymentInfoAction])
+  }
+
+  private updatePaymentInfo(myPayment: MyPayment, paymentUpdateActions: MyPaymentUpdateAction[]) {
     this.apiRoot.me()
       .payments()
       .withId({
@@ -42,12 +73,7 @@ export class PaymentService extends AbstractCommercetoolsService {
       .post({
         body:{
           version: myPayment.version,
-          actions: [
-            {
-              action: 'changeAmountPlanned',
-              amount: paymentAmount
-            }
-          ]
+          actions: paymentUpdateActions
         }
       })
       .execute()
@@ -85,6 +111,7 @@ export class PaymentService extends AbstractCommercetoolsService {
   }
 
   private updatePaymentInfoInSessionAndSubject(myPayment: MyPayment) {
+    console.log(myPayment)
     localStorage.setItem('session_payment_info', JSON.stringify(myPayment))
     this.paymentUpdatedSubject.next(true)
   }
