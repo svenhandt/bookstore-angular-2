@@ -21,7 +21,7 @@ export class CheckoutPageComponent implements OnInit, OnDestroy {
 
   currentCart$: Observable<CartModel>
 
-  private paymentUpdatedSubscription: Subscription
+  private paymentAmountUpdatedSubscription: Subscription
 
   constructor(private currentPageService: CurrentPageService,
               private cartService: CartService,
@@ -31,7 +31,7 @@ export class CheckoutPageComponent implements OnInit, OnDestroy {
   ngOnInit(): void {
     this.currentPageService.setIsCheckoutPage(true)
     this.currentCart$ = this.cartService.currentCart$
-    this.paymentUpdatedSubscription = this.paymentService.paymentUpdated$.subscribe((paymentUpdated: boolean) => {
+    this.paymentAmountUpdatedSubscription = this.paymentService.paymentAmountUpdated$.subscribe((paymentUpdated: boolean) => {
       if(paymentUpdated) {
         this.router.navigate(['/checkout-summary'])
       }
@@ -52,8 +52,8 @@ export class CheckoutPageComponent implements OnInit, OnDestroy {
   ngOnDestroy(): void {
     this.currentPageService.setIsCheckoutPage(false)
     this.paymentService.resetPaymentUpdated()
-    if(this.paymentUpdatedSubscription) {
-      this.paymentUpdatedSubscription.unsubscribe()
+    if(this.paymentAmountUpdatedSubscription) {
+      this.paymentAmountUpdatedSubscription.unsubscribe()
     }
   }
 

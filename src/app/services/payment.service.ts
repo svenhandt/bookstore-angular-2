@@ -15,8 +15,11 @@ import {BehaviorSubject} from "rxjs";
 })
 export class PaymentService extends AbstractCommercetoolsService {
 
-  private paymentUpdatedSubject = new BehaviorSubject<boolean>(false)
-  paymentUpdated$ = this.paymentUpdatedSubject.asObservable()
+  private paymentAmountUpdatedSubject = new BehaviorSubject<boolean>(false)
+  paymentAmountUpdated$ = this.paymentAmountUpdatedSubject.asObservable()
+
+  private paymentAuthorizedSubject = new BehaviorSubject<boolean>(false)
+  paymentAuthorized$ = this.paymentAuthorizedSubject.asObservable()
 
   constructor(commercetoolsApiService: CommercetoolsApiService) {
     super(commercetoolsApiService)
@@ -33,18 +36,20 @@ export class PaymentService extends AbstractCommercetoolsService {
     }
   }
 
-  addChargeTransactionToPaymentInfo() {
+  addAuthorizeTransactionToPaymentInfo() {
     const myPaymentAsStr = localStorage.getItem('session_payment_info')
     if(myPaymentAsStr) {
       const myPayment = JSON.parse(myPaymentAsStr) as MyPayment
-      const addChargeTransactionAction: MyPaymentUpdateAction = {
+      const addAuthorizationTransactionAction: MyPaymentUpdateAction = {
         action: "addTransaction",
         transaction: {
           type: "Authorization",
           amount: myPayment.amountPlanned
         }
       }
-      this.updatePaymentInfo(myPayment, [addChargeTransactionAction])
+      this.updatePaymentInfo(myPayment, [addAuthorizationTransactionAction]).then(({body}: ClientResponse<MyPayment>) => {
+        this.updatePaymentAuthStatusInSessionAndSubject(body)
+      })
     }
   }
 
@@ -53,7 +58,7 @@ export class PaymentService extends AbstractCommercetoolsService {
   }
 
   resetPaymentUpdated() {
-    this.paymentUpdatedSubject.next(false)
+    this.paymentAmountUpdatedSubject.next(false)
   }
 
   private changeAmountInPaymentInfo(myPayment: MyPayment, paymentAmount: Money) {
@@ -62,10 +67,13 @@ export class PaymentService extends AbstractCommercetoolsService {
       amount: paymentAmount
     }
     this.updatePaymentInfo(myPayment, [changeAmountInPaymentInfoAction])
+      .then(({body}: ClientResponse<MyPayment>) => {
+      this.updatePaymentAmountInSessionAndSubject(body)
+    })
   }
 
-  private updatePaymentInfo(myPayment: MyPayment, paymentUpdateActions: MyPaymentUpdateAction[]) {
-    this.apiRoot.me()
+  private updatePaymentInfo(myPayment: MyPayment, paymentUpdateActions: MyPaymentUpdateAction[]): Promise<ClientResponse<MyPayment>> {
+    return this.apiRoot.me()
       .payments()
       .withId({
         ID: myPayment.id
@@ -77,9 +85,6 @@ export class PaymentService extends AbstractCommercetoolsService {
         }
       })
       .execute()
-      .then(({body}: ClientResponse<MyPayment>) => {
-        this.updatePaymentInfoInSessionAndSubject(body)
-      })
   }
 
   private addPaymentInfo(paymentAmount: Money) {
@@ -91,7 +96,7 @@ export class PaymentService extends AbstractCommercetoolsService {
       })
       .execute()
       .then(({body}: ClientResponse<MyPayment>) => {
-        this.updatePaymentInfoInSessionAndSubject(body)
+        this.updatePaymentAmountInSessionAndSubject(body)
       })
   }
 
@@ -110,10 +115,28 @@ export class PaymentService extends AbstractCommercetoolsService {
     return paymentMethodInfo
   }
 
-  private updatePaymentInfoInSessionAndSubject(myPayment: MyPayment) {
+  private updatePaymentAmountInSessionAndSubject(myPayment: MyPayment) {
     console.log(myPayment)
     localStorage.setItem('session_payment_info', JSON.stringify(myPayment))
-    this.paymentUpdatedSubject.next(true)
+    this.paymentAmountUpdatedSubject.next(true)
+  }
+
+  private updatePaymentAuthStatusInSessionAndSubject(myPayment: MyPayment) {
+    localStorage.setItem('session_payment_info', JSON.stringify(myPayment))
+    if(this.isPaymentAuthorized(myPayment)) {
+      this.paymentAuthorizedSubject.next(true)
+    }
+  }
+
+  private isPaymentAuthorized(myPayment: MyPayment) {
+    let isPaymentAuthorized = false
+    const transactions = myPayment.transactions
+    for(const transaction of transactions) {
+      if(transaction.type === 'Authorization') {
+        isPaymentAuthorized = true
+      }
+    }
+    return isPaymentAuthorized
   }
 
 }
