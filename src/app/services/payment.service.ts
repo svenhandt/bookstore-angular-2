@@ -61,6 +61,10 @@ export class PaymentService extends AbstractCommercetoolsService {
     this.paymentAmountUpdatedSubject.next(false)
   }
 
+  resetPaymentAuthorizedSubject() {
+    this.paymentAuthorizedSubject.next(false)
+  }
+
   private changeAmountInPaymentInfo(myPayment: MyPayment, paymentAmount: Money) {
     const changeAmountInPaymentInfoAction: MyPaymentUpdateAction = {
       action: 'changeAmountPlanned',

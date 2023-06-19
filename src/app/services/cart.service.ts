@@ -2,11 +2,12 @@ import {Inject, Injectable, LOCALE_ID} from '@angular/core';
 import {CartModel} from "../data/cart.model";
 import {BehaviorSubject} from "rxjs";
 import {ProductModel} from "../data/product.model";
-import {CartEntryModel} from "../data/cartentry.model";
-import {Attribute, Cart, ClientResponse, LineItem, MyCartUpdateAction} from "@commercetools/platform-sdk";
+import {LineItemModel} from "../data/lineItemModel";
+import {Cart, ClientResponse, MyCartUpdateAction} from "@commercetools/platform-sdk";
 import {CommercetoolsApiService} from "./infrastructure/commercetools.api.service";
 import {AbstractCommercetoolsService} from "./abstract/abstract.commercetools.service";
 import {AddressModel} from "../data/address.model";
+import {AbstractOrderService} from "./abstract.order.service";
 
 @Injectable({
   providedIn: 'root'
@@ -17,7 +18,8 @@ export class CartService extends AbstractCommercetoolsService {
   currentCart$ = this.cartSubject.asObservable()
 
   constructor(@Inject(LOCALE_ID) private locale: string,
-              commercetoolsApiService: CommercetoolsApiService) {
+              commercetoolsApiService: CommercetoolsApiService,
+              private abstractOrderService: AbstractOrderService) {
     super(commercetoolsApiService)
   }
 
@@ -32,7 +34,7 @@ export class CartService extends AbstractCommercetoolsService {
     }])
   }
 
-  removeFromCart(cartEntry: CartEntryModel) {
+  removeFromCart(cartEntry: LineItemModel) {
     this.updateCart([{
       action: 'removeLineItem',
       lineItemId: cartEntry.id
@@ -119,129 +121,9 @@ export class CartService extends AbstractCommercetoolsService {
 
   private buildCartAndNext(rawCart: Cart) {
     const cart = new CartModel()
-    cart.id = rawCart.id
-    cart.version = rawCart.version
-    cart.customerId = rawCart.anonymousId
-    this.buildCartEntries(cart, rawCart)
-    this.buildDeliveryAddress(cart, rawCart)
-    this.setTotalPrice(cart, rawCart)
-    this.setTotalTax(cart, rawCart)
+    this.abstractOrderService.build(cart, rawCart)
     console.log(cart)
     this.cartSubject.next(cart)
-  }
-
-  private buildCartEntries(cart: CartModel, rawCart: Cart) {
-    const lineItems: LineItem[] = rawCart.lineItems
-    if(lineItems) {
-      for(const lineItem of lineItems) {
-        const cartEntry : CartEntryModel = new CartEntryModel()
-        cartEntry.id = lineItem.id
-        this.setProductForCartEntry(cartEntry, lineItem)
-        cartEntry.quantity = lineItem.quantity
-        this.setEntryTotalPrice(cartEntry, lineItem)
-        cart.entries.push(cartEntry)
-      }
-    }
-  }
-
-  private buildDeliveryAddress(cart: CartModel, rawCart: Cart) {
-    const rawDeliveryAddress = rawCart.shippingAddress
-    if(rawDeliveryAddress) {
-      const deliveryAddress = new AddressModel()
-      deliveryAddress.id = rawDeliveryAddress.id
-      deliveryAddress.country = rawDeliveryAddress.country
-      deliveryAddress.firstName = rawDeliveryAddress.firstName
-      deliveryAddress.lastName = rawDeliveryAddress.lastName
-      deliveryAddress.street = rawDeliveryAddress.streetName
-      deliveryAddress.streetNumber = rawDeliveryAddress.streetNumber
-      deliveryAddress.zipCode = rawDeliveryAddress.postalCode
-      deliveryAddress.town = rawDeliveryAddress.city
-      cart.deliveryAddress = deliveryAddress
-    }
-  }
-
-
-  private setProductForCartEntry(cartEntry: CartEntryModel, lineItem: LineItem) {
-    const product = new ProductModel()
-    product.id = lineItem.productId
-    product.name = lineItem.name[this.locale]
-    this.setEntryProductPrice(product, lineItem)
-    this.setAuthor(product, lineItem)
-    this.setIsbn(product, lineItem)
-    this.setImage(product, lineItem)
-    cartEntry.product = product
-  }
-
-  private setAuthor(product: ProductModel, lineItem: LineItem) {
-    if(lineItem.variant) {
-      lineItem.variant.attributes
-      const authorData = lineItem.variant.attributes.find((attribute: Attribute) => {
-        return attribute.name === 'author'
-      })
-      if (authorData) {
-        product.author = authorData.value
-      }
-    }
-  }
-
-  private setIsbn(product: ProductModel, lineItem: LineItem) {
-    if(lineItem.variant) {
-      const isbnData = lineItem.variant.attributes.find((attribute: Attribute) => {
-        return attribute.name === 'isbn'
-      })
-      if (isbnData) {
-        product.isbn = isbnData.value
-      }
-    }
-  }
-
-  private setImage(product: ProductModel, lineItem: LineItem) {
-    if(lineItem.variant) {
-      const images = lineItem.variant.images
-      if (images && images.length > 0) {
-        product.imageUrl = images[0].url
-      }
-    }
-  }
-
-  private setEntryTotalPrice(cartEntry: CartEntryModel, lineItem: LineItem) {
-    const rawTotalEntryPrice = lineItem.totalPrice
-    if(rawTotalEntryPrice && rawTotalEntryPrice.centAmount) {
-      cartEntry.entryTotalPrice = rawTotalEntryPrice.centAmount / 100
-    }
-  }
-
-  private setEntryProductPrice(product: ProductModel, lineItem: LineItem) {
-    const rawProductPrice = lineItem.price
-    const rawPriceValue = rawProductPrice.value
-    if(rawPriceValue && rawPriceValue.centAmount) {
-      product.price = rawPriceValue.centAmount / 100
-    }
-  }
-
-  private setTotalPrice(cart: CartModel, rawCart: Cart) {
-    const rawTotalPrice = rawCart.totalPrice
-    if(rawTotalPrice) {
-      const centAmount = rawTotalPrice.centAmount
-      const currencyCode = rawTotalPrice.currencyCode
-      if(centAmount && currencyCode) {
-        cart.totalPrice = centAmount / 100
-        cart.totalPriceAsMoney = {
-          centAmount: centAmount,
-          currencyCode: currencyCode
-        }
-      }
-    }
-  }
-
-  private setTotalTax(cart: CartModel, rawCart: Cart) {
-    const rawTaxedPrice = rawCart.taxedPrice
-    if(rawTaxedPrice) {
-      const rawTotalTax = rawTaxedPrice.totalTax
-      if(rawTotalTax && rawTotalTax.centAmount) {
-        cart.totalTax = rawTotalTax.centAmount / 100
-      }
-    }
   }
 
 }

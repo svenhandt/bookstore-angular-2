@@ -2,7 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import {Observable} from "rxjs";
 import {CartModel} from "../../data/cart.model";
 import {CartService} from "../../services/cart.service";
-import {CartEntryModel} from "../../data/cartentry.model";
+import {LineItemModel} from "../../data/lineItemModel";
 import {CustomerService} from "../../services/customer.service";
 import {Router} from "@angular/router";
 
@@ -25,7 +25,7 @@ export class CartPageComponent implements OnInit {
     this.currentCart$ = this.cartService.currentCart$
   }
 
-  onRemoveEntry(cartEntry: CartEntryModel) {
+  onRemoveEntry(cartEntry: LineItemModel) {
     this.cartService.removeFromCart(cartEntry)
   }
 

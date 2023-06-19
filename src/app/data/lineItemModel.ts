@@ -1,6 +1,6 @@
 import {ProductModel} from "./product.model";
 
-export class CartEntryModel {
+export class LineItemModel {
 
   id: string
   product: ProductModel

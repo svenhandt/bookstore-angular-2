@@ -1,11 +1,12 @@
 import {Component, OnDestroy, OnInit} from '@angular/core';
 import {CurrentPageService} from "../../services/infrastructure/current-page.service";
 import {CartService} from "../../services/cart.service";
-import {combineLatest, concatMap, Observable, startWith, switchMap} from "rxjs";
+import {combineLatest, concatMap, EMPTY, empty, Observable, startWith, switchMap} from "rxjs";
 import {CartModel} from "../../data/cart.model";
 import {PaymentService} from "../../services/payment.service";
 import {Router} from "@angular/router";
 import {OrderService} from "../../services/order.service";
+import {OrderModel} from "../../data/order.model";
 
 @Component({
   selector: 'app-checkout-summary-page',
@@ -37,11 +38,15 @@ export class CheckoutSummaryPageComponent implements OnInit, OnDestroy {
     combineLatest([this.currentCart$, this.paymentAuthorized$]).pipe(
       switchMap(([currentCart, paymentAuthorizedSuccess]) => {
         if(currentCart && paymentAuthorizedSuccess) {
-
+          return this.orderService.createOrderFromCart(currentCart)
         }
-        return new Observable()
+        else {
+          return EMPTY
+        }
       })
-    )
+    ).subscribe((order: OrderModel) => {
+      this.paymentService.resetPaymentAuthorizedSubject()
+    })
   }
 
   onPlaceOrder() {
