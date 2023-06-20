@@ -61,8 +61,10 @@ export class PaymentService extends AbstractCommercetoolsService {
     this.paymentAmountUpdatedSubject.next(false)
   }
 
-  resetPaymentAuthorizedSubject() {
+  resetAll() {
+    this.paymentAmountUpdatedSubject.next(false)
     this.paymentAuthorizedSubject.next(false)
+    localStorage.removeItem('session_payment_info')
   }
 
   private changeAmountInPaymentInfo(myPayment: MyPayment, paymentAmount: Money) {

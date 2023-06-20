@@ -1,7 +1,7 @@
 import {Component, OnDestroy, OnInit} from '@angular/core';
 import {CurrentPageService} from "../../services/infrastructure/current-page.service";
 import {CartService} from "../../services/cart.service";
-import {combineLatest, concatMap, EMPTY, empty, Observable, startWith, switchMap} from "rxjs";
+import {combineLatest, concatMap, EMPTY, empty, Observable, shareReplay, startWith, switchMap} from "rxjs";
 import {CartModel} from "../../data/cart.model";
 import {PaymentService} from "../../services/payment.service";
 import {Router} from "@angular/router";
@@ -36,16 +36,21 @@ export class CheckoutSummaryPageComponent implements OnInit, OnDestroy {
       this.router.navigate(['/checkout'])
     }
     combineLatest([this.currentCart$, this.paymentAuthorized$]).pipe(
-      switchMap(([currentCart, paymentAuthorizedSuccess]) => {
+      concatMap(([currentCart, paymentAuthorizedSuccess]) => {
         if(currentCart && paymentAuthorizedSuccess) {
-          return this.orderService.createOrderFromCart(currentCart)
+          this.orderService.createOrderFromCart(currentCart)
+          return this.orderService.createdOrder$
         }
         else {
           return EMPTY
         }
       })
     ).subscribe((order: OrderModel) => {
-      this.paymentService.resetPaymentAuthorizedSubject()
+      console.log('Nach Bestellung')
+      console.log(order)
+      if(order && order.id) {
+        this.router.navigate(['/order-confirmation'])
+      }
     })
   }
 
