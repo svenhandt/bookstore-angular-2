@@ -27,9 +27,9 @@ export class AbstractOrderService {
     if(rawLineItems) {
       for(const rawLineItem of rawLineItems) {
         const lineItem : LineItemModel = new LineItemModel()
-        lineItem.id = lineItem.id
+        lineItem.id = rawLineItem.id
         this.setProductForCartEntry(lineItem, rawLineItem)
-        lineItem.quantity = lineItem.quantity
+        lineItem.quantity = rawLineItem.quantity
         this.setEntryTotalPrice(lineItem, rawLineItem)
         abstractOrder.entries.push(lineItem)
       }

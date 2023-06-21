@@ -69,6 +69,7 @@ export class CartService extends AbstractCommercetoolsService {
   }
 
   private updateCart(updateActions: MyCartUpdateAction[]) {
+    console.log(updateActions)
     const currentCart = this.cartSubject.getValue()
     if(currentCart) {
       const id = currentCart.id

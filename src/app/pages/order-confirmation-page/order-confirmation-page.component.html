@@ -1,103 +1,54 @@
-<div class="container">
-  <div class="row">
-    <div class="col-12 order-confirmation-header">
-      <h3>Vielen Dank für Ihre Bestellung</h3>
-      <p>Ihre Bestellung wird nun bearbeitet. Ihre Bestellnummer lautet xxxxxxxxxxxx</p>
+<ng-container *ngIf="(createdOrder$ | async) as createdOrder">
+  <div class="container">
+    <div class="row">
+      <div class="col-12 order-confirmation-header">
+        <h3>Vielen Dank für Ihre Bestellung</h3>
+        <p>Ihre Bestellung wird nun bearbeitet. Ihre Bestellnummer lautet {{createdOrder.id}}</p>
+      </div>
+    </div>
+    <div class="row">
+      <table class="table">
+        <tbody>
+        <tr *ngFor="let entry of createdOrder.entries">
+          <th scope="row">
+            <img class="img-fluid" style="max-height: 200px" [src]="entry.product.imageUrl">
+          </th>
+          <td>
+            <div class="row">
+              <h4>{{entry.product.name}}</h4>
+            </div>
+            <div class="row">
+              <p>{{entry.product.author}}</p>
+            </div>
+            <div class="row">
+              <p>ISBN: {{entry.product.isbn}}</p>
+            </div>
+          </td>
+          <td>
+            <div class="row">
+              <p>Anzahl: {{entry.quantity}}</p>
+            </div>
+          </td>
+          <td>
+            <div class="row">
+              <p style="font-weight: bold">{{entry.entryTotalPrice | currency:'EUR':'symbol':'1.2-2'}}</p>
+            </div>
+          </td>
+        </tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="row">
+      <div class="col-12 order-confirmation-total">
+        <h4>Gesamtpreis: {{createdOrder.totalPrice | currency:'EUR':'symbol':'1.2-2'}}</h4>
+        <p>MwSt: {{createdOrder.totalTax | currency:'EUR':'symbol':'1.2-2'}}</p>
+      </div>
+    </div>
+    <div class="row">
+      <div class="col-12 order-confirmation-continue-shopping">
+        <button type="button" class="btn btn-secondary" routerLink="/">Weiter einkaufen</button>
+      </div>
     </div>
   </div>
-  <div class="row">
-    <table class="table">
-      <tbody>
-      <tr>
-        <th scope="row">
-          <img class="img-fluid" style="max-height: 200px" src="../../assets/books/node_book-big.jpeg">
-        </th>
-        <td>
-          <div class="row">
-            <h4>Node.js – Rezepte und Lösungen</h4>
-          </div>
-          <div class="row">
-            <p>Philip Ackermann</p>
-          </div>
-          <div class="row">
-            <p>ISBN: xxxxxxxxxxxxxxxxxxx</p>
-          </div>
-        </td>
-        <td>
-          <div class="row">
-            <p>Anzahl: 1</p>
-          </div>
-        </td>
-        <td>
-          <div class="row">
-            <p style="font-weight: bold">49,90</p>
-          </div>
-        </td>
-      </tr>
-      <tr>
-        <th scope="row">
-          <img class="img-fluid" style="max-height: 200px" src="../../assets/books/node_book-big.jpeg">
-        </th>
-        <td>
-          <div class="row">
-            <h4>Node.js – Rezepte und Lösungen</h4>
-          </div>
-          <div class="row">
-            <p>Philip Ackermann</p>
-          </div>
-          <div class="row">
-            <p>ISBN: xxxxxxxxxxxxxxxxxxx</p>
-          </div>
-        </td>
-        <td>
-          <div class="row">
-            <p>Anzahl: 1</p>
-          </div>
-        </td>
-        <td>
-          <div class="row">
-            <p style="font-weight: bold">49,90</p>
-          </div>
-        </td>
-      </tr>
-      <tr>
-        <th scope="row">
-          <img class="img-fluid" style="max-height: 200px" src="../../assets/books/node_book-big.jpeg">
-        </th>
-        <td>
-          <div class="row">
-            <h4>Node.js – Rezepte und Lösungen</h4>
-          </div>
-          <div class="row">
-            <p>Philip Ackermann</p>
-          </div>
-          <div class="row">
-            <p>ISBN: xxxxxxxxxxxxxxxxxxx</p>
-          </div>
-        </td>
-        <td>
-          <div class="row">
-            <p>Anzahl: 1</p>
-          </div>
-        </td>
-        <td>
-          <div class="row">
-            <p style="font-weight: bold">49,90</p>
-          </div>
-        </td>
-      </tr>
-      </tbody>
-    </table>
-  </div>
-  <div class="row">
-    <div class="col-12 order-confirmation-total">
-      <h4>Gesamtpreis: 149,70</h4>
-      <p>MwSt: 23,90</p>
-    </div>
-  </div>
-  <div class="row">
-    <div class="col-12 order-confirmation-continue-shopping">
-      <button type="button" class="btn btn-secondary">Weiter einkaufen</button>
-    </div>
-  </div>
-</div>
+
+</ng-container>

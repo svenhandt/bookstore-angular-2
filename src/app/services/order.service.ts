@@ -8,6 +8,7 @@ import {OrderModel} from "../data/order.model";
 import {AbstractOrderService} from "./abstract.order.service";
 import {CartService} from "./cart.service";
 import {PaymentService} from "./payment.service";
+import {CustomerService} from "./customer.service";
 
 @Injectable({
   providedIn: 'root'
@@ -17,6 +18,7 @@ export class OrderService extends AbstractCommercetoolsService {
   constructor(commercetoolsApiService: CommercetoolsApiService,
               private abstractOrderService: AbstractOrderService,
               private cartService: CartService,
+              private customerService: CustomerService,
               private paymentService: PaymentService) {
     super(commercetoolsApiService)
   }
@@ -44,9 +46,13 @@ export class OrderService extends AbstractCommercetoolsService {
       })
   }
 
+  resetCreatedOrder() {
+    this.createdOrderSubject.next(null)
+  }
+
   private handleCreateOrderResponseSuccess(rawOrder: Order) {
     const order = this.createOrder(rawOrder)
-    this.cartService.retrieveCurrentCart()
+    this.recreateCart()
     this.paymentService.resetAll()
     this.createdOrderSubject.next(order)
   }
@@ -61,6 +67,14 @@ export class OrderService extends AbstractCommercetoolsService {
   private setOrderState(order: OrderModel, rawOrder: Order) {
     const rawOrderState = rawOrder.orderState as 'Open' | 'Confirmed' | 'Cancelled' | 'Complete'
     order.orderState = rawOrderState
+  }
+
+  private recreateCart() {
+    this.cartService.retrieveCurrentCart()
+    const currentCustomer = this.customerService.currentCustomerSubject.getValue()
+    if(currentCustomer) {
+      this.cartService.setBillingAndShippingAddress(currentCustomer.address)
+    }
   }
 
 }
