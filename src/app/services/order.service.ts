@@ -15,6 +15,9 @@ import {CustomerService} from "./customer.service";
 })
 export class OrderService extends AbstractCommercetoolsService {
 
+  private createdOrderSubject = new BehaviorSubject<OrderModel>(null)
+  createdOrder$ = this.createdOrderSubject.asObservable()
+
   constructor(commercetoolsApiService: CommercetoolsApiService,
               private abstractOrderService: AbstractOrderService,
               private cartService: CartService,
@@ -22,9 +25,6 @@ export class OrderService extends AbstractCommercetoolsService {
               private paymentService: PaymentService) {
     super(commercetoolsApiService)
   }
-
-  private createdOrderSubject = new BehaviorSubject<OrderModel>(null)
-  createdOrder$ = this.createdOrderSubject.asObservable()
 
   createOrderFromCart(currentCart: CartModel) {
     const myOrderFromCartDraft: MyOrderFromCartDraft = {
@@ -52,7 +52,7 @@ export class OrderService extends AbstractCommercetoolsService {
 
   private handleCreateOrderResponseSuccess(rawOrder: Order) {
     const order = this.createOrder(rawOrder)
-    this.recreateCart()
+    this.cartService.retrieveCurrentCart()
     this.paymentService.resetAll()
     this.createdOrderSubject.next(order)
   }
@@ -67,14 +67,6 @@ export class OrderService extends AbstractCommercetoolsService {
   private setOrderState(order: OrderModel, rawOrder: Order) {
     const rawOrderState = rawOrder.orderState as 'Open' | 'Confirmed' | 'Cancelled' | 'Complete'
     order.orderState = rawOrderState
-  }
-
-  private recreateCart() {
-    this.cartService.retrieveCurrentCart()
-    const currentCustomer = this.customerService.currentCustomerSubject.getValue()
-    if(currentCustomer) {
-      this.cartService.setBillingAndShippingAddress(currentCustomer.address)
-    }
   }
 
 }
