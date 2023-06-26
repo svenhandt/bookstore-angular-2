@@ -1,6 +1,6 @@
 import {Component, OnDestroy, OnInit} from '@angular/core';
 import {OrderService} from "../../services/order.service";
-import {Observable, Subscription} from "rxjs";
+import {Observable, Subscription, tap} from "rxjs";
 import {OrderModel} from "../../data/order.model";
 import {CartService} from "../../services/cart.service";
 import {CustomerService} from "../../services/customer.service";
@@ -30,7 +30,6 @@ export class OrderConfirmationPageComponent implements OnInit, OnDestroy {
   }
 
   ngOnDestroy(): void {
-    this.orderService.resetCreatedOrder()
     if(this.cartSubscription) {
       this.cartSubscription.unsubscribe()
     }

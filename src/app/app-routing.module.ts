@@ -15,8 +15,8 @@ import {LoginRegisterPageComponent} from "./pages/login-register-page/login-regi
 import {
   EditCustomerDetailsPageComponent
 } from "./pages/edit-customer-details-page/edit-customer-details-page.component";
-import {AuthGuardService} from "./services/auth/auth.guard.service";
-import {LoginPageGuardService} from "./services/auth/login.page.guard.service";
+import {AuthGuardService} from "./services/guards/auth/auth.guard.service";
+import {LoginPageGuardService} from "./services/guards/auth/login.page.guard.service";
 
 const routes: Routes = [
   {path: '', redirectTo: '/home', pathMatch: 'full'},
