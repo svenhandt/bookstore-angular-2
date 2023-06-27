@@ -17,6 +17,8 @@ import {
 } from "./pages/edit-customer-details-page/edit-customer-details-page.component";
 import {AuthGuardService} from "./services/guards/auth/auth.guard.service";
 import {LoginPageGuardService} from "./services/guards/auth/login.page.guard.service";
+import {OrderGuardService} from "./services/guards/order/order.guard.service";
+import {PaymentGuardService} from "./services/guards/payment/payment.guard.service";
 
 const routes: Routes = [
   {path: '', redirectTo: '/home', pathMatch: 'full'},
@@ -25,8 +27,8 @@ const routes: Routes = [
   {path: 'product-details/:id', component: ProductDetailsPageComponent},
   {path: 'cart', component: CartPageComponent},
   {path: 'checkout', component: CheckoutPageComponent, canActivate: [AuthGuardService]},
-  {path: 'checkout-summary', component: CheckoutSummaryPageComponent, canActivate: [AuthGuardService]},
-  {path: 'order-confirmation', component: OrderConfirmationPageComponent, canActivate: [AuthGuardService]},
+  {path: 'checkout-summary', component: CheckoutSummaryPageComponent, canActivate: [AuthGuardService, PaymentGuardService]},
+  {path: 'order-confirmation', component: OrderConfirmationPageComponent, canActivate: [AuthGuardService, OrderGuardService]},
   {path: 'order-history', component: OrderHistoryPageComponent, canActivate: [AuthGuardService]},
   {path: 'order-history-details', component: OrderHistoryDetailsPageComponent, canActivate: [AuthGuardService]},
   {path: 'login-register', component: LoginRegisterPageComponent, canActivate: [LoginPageGuardService]},

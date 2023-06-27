@@ -32,9 +32,6 @@ export class CheckoutSummaryPageComponent implements OnInit, OnDestroy {
     this.paymentAuthorized$ = this.paymentService.paymentAuthorized$.pipe(
       startWith(false)
     )
-    if(!this.paymentService.checkHasPaymentInfo()) {
-      this.router.navigate(['/checkout'])
-    }
     combineLatest([this.currentCart$, this.paymentAuthorized$]).pipe(
       concatMap(([currentCart, paymentAuthorizedSuccess]) => {
         if(currentCart && paymentAuthorizedSuccess) {

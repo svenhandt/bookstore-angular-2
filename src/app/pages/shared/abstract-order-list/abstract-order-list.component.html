@@ -1,0 +1,38 @@
+<div class="row">
+  <table class="table">
+    <tbody>
+    <tr *ngFor="let abstractOrderEntry of abstractOrder.entries">
+      <th scope="row">
+        <img class="img-fluid" style="max-height: 200px" [src]="abstractOrderEntry.product.imageUrl">
+      </th>
+      <td>
+        <div class="row">
+          <h4>{{abstractOrderEntry.product.name}}</h4>
+        </div>
+        <div class="row">
+          <p>{{abstractOrderEntry.product.author}}</p>
+        </div>
+        <div class="row">
+          <p>ISBN: {{abstractOrderEntry.product.isbn}}</p>
+        </div>
+      </td>
+      <td>
+        <div class="row">
+          <p>Anzahl: {{abstractOrderEntry.quantity}}</p>
+        </div>
+      </td>
+      <td>
+        <div class="row">
+          <p style="font-weight: bold">{{abstractOrderEntry.entryTotalPrice | currency:'EUR':'symbol':'1.2-2'}}</p>
+        </div>
+      </td>
+    </tr>
+    </tbody>
+  </table>
+</div>
+<div class="row">
+  <div class="col-12 abstract-order-total">
+    <h4>Gesamtpreis: {{abstractOrder.totalPrice | currency:'EUR':'symbol':'1.2-2'}}</h4>
+    <p>MwSt: {{abstractOrder.totalTax | currency:'EUR':'symbol':'1.2-2'}}</p>
+  </div>
+</div>

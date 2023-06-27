@@ -5,44 +5,7 @@
         <h3>Ihre Bestellübersicht</h3>
       </div>
     </div>
-    <div class="row">
-      <table class="table">
-        <tbody>
-        <tr *ngFor="let cartEntry of currentCart.entries">
-          <th scope="row">
-            <img class="img-fluid" style="max-height: 200px" [src]="cartEntry.product.imageUrl">
-          </th>
-          <td>
-            <div class="row">
-              <h4>{{cartEntry.product.name}}</h4>
-            </div>
-            <div class="row">
-              <p>{{cartEntry.product.author}}</p>
-            </div>
-            <div class="row">
-              <p>ISBN: {{cartEntry.product.isbn}}</p>
-            </div>
-          </td>
-          <td>
-            <div class="row">
-              <p>Anzahl: {{cartEntry.quantity}}</p>
-            </div>
-          </td>
-          <td>
-            <div class="row">
-              <p style="font-weight: bold">{{cartEntry.entryTotalPrice | currency:'EUR':'symbol':'1.2-2'}}</p>
-            </div>
-          </td>
-        </tr>
-        </tbody>
-      </table>
-    </div>
-    <div class="row">
-      <div class="col-12 checkout-summary-page-total">
-        <h4>Gesamtpreis: {{currentCart.totalPrice | currency:'EUR':'symbol':'1.2-2'}}</h4>
-        <p>MwSt: {{currentCart.totalTax | currency:'EUR':'symbol':'1.2-2'}}</p>
-      </div>
-    </div>
+    <app-abstract-order-list [abstractOrder]="currentCart"></app-abstract-order-list>
     <div class="row">
       <div class="col-12">
         <form #placeOrderForm="ngForm"

@@ -10,17 +10,18 @@ import {CartService} from "./cart.service";
 import {PaymentService} from "./payment.service";
 import {CustomerService} from "./customer.service";
 
-const LAST_CREATED_ORDER = 'last_created_order'
+export const LAST_CREATED_ORDER = 'last_created_order'
 
 @Injectable({
   providedIn: 'root'
 })
 export class OrderService extends AbstractCommercetoolsService {
 
-  private LAST_CREATED_ORDER = 'last_created_order'
-
   private createdOrderSubject = new BehaviorSubject<OrderModel>(null)
   createdOrder$ = this.createdOrderSubject.asObservable()
+
+  private orderHistoryListSubject = new BehaviorSubject<OrderModel[]>([])
+  orderHistoryList$ = this.orderHistoryListSubject.asObservable()
 
   constructor(commercetoolsApiService: CommercetoolsApiService,
               private abstractOrderService: AbstractOrderService,
@@ -52,8 +53,12 @@ export class OrderService extends AbstractCommercetoolsService {
       })
   }
 
+  private retrieveOrderHistory() {
+
+  }
+
   private setCreatedOrderFromSession() {
-    const createdOrderAsStr = localStorage.getItem(this.LAST_CREATED_ORDER)
+    const createdOrderAsStr = localStorage.getItem(LAST_CREATED_ORDER)
     if(createdOrderAsStr) {
       const createdOrder = JSON.parse(createdOrderAsStr) as OrderModel
       this.createdOrderSubject.next(createdOrder)

@@ -6,12 +6,6 @@
   color: darkblue;
 }
 
-.checkout-summary-page-total {
-  margin-top: 50px;
-  margin-bottom: 20px;
-  text-align: right;
-}
-
 .checkout-summary-page-privacy {
   margin-top: 50px;
   display: flex;
