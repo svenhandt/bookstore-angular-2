@@ -2,8 +2,8 @@ import {Injectable} from '@angular/core';
 import {AbstractCommercetoolsService} from "./abstract/abstract.commercetools.service";
 import {CommercetoolsApiService} from "./infrastructure/commercetools.api.service";
 import {CartModel} from "../data/cart.model";
-import {Cart, ClientResponse, MyOrderFromCartDraft, Order} from "@commercetools/platform-sdk";
-import {BehaviorSubject, Observable} from "rxjs";
+import {ClientResponse, MyOrderFromCartDraft, Order, OrderPagedQueryResponse} from "@commercetools/platform-sdk";
+import {BehaviorSubject} from "rxjs";
 import {OrderModel} from "../data/order.model";
 import {AbstractOrderService} from "./abstract.order.service";
 import {CartService} from "./cart.service";
@@ -53,8 +53,25 @@ export class OrderService extends AbstractCommercetoolsService {
       })
   }
 
-  private retrieveOrderHistory() {
+  retrieveOrderHistory() {
+    const existingOrderHistoryList = this.orderHistoryListSubject.getValue()
+    if(!existingOrderHistoryList || existingOrderHistoryList.length === 0) {
+      this.retrieveOrderHistoryFromCommercetools()
+    }
+  }
 
+  private retrieveOrderHistoryFromCommercetools() {
+    this.apiRoot
+      .me()
+      .orders()
+      .get()
+      .execute()
+      .then(({body}: ClientResponse<OrderPagedQueryResponse>) => {
+        const rawOrders = body.results
+        if(rawOrders) {
+          this.createOrdersForHistory(rawOrders)
+        }
+      })
   }
 
   private setCreatedOrderFromSession() {
@@ -80,6 +97,14 @@ export class OrderService extends AbstractCommercetoolsService {
     this.paymentService.resetAll()
     localStorage.setItem(LAST_CREATED_ORDER, JSON.stringify(order));
     this.createdOrderSubject.next(order)
+  }
+
+  private createOrdersForHistory(rawOrders: Order[]) {
+    const orders: OrderModel[] = []
+    for(const rawOrder of rawOrders) {
+      orders.push(this.createOrder(rawOrder))
+    }
+    this.orderHistoryListSubject.next(orders)
   }
 
   private createOrder(rawOrder: Order): OrderModel {

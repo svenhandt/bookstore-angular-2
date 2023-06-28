@@ -1,4 +1,7 @@
 import { Component, OnInit } from '@angular/core';
+import {OrderService} from "../../services/order.service";
+import {Observable} from "rxjs";
+import {OrderModel} from "../../data/order.model";
 
 @Component({
   selector: 'app-order-history-page',
@@ -7,9 +10,13 @@ import { Component, OnInit } from '@angular/core';
 })
 export class OrderHistoryPageComponent implements OnInit {
 
-  constructor() { }
+  orderHistoryList$: Observable<OrderModel[]>
+
+  constructor(private orderService: OrderService) { }
 
   ngOnInit(): void {
+    this.orderHistoryList$ = this.orderService.orderHistoryList$
+    this.orderService.retrieveOrderHistory()
   }
 
 }
