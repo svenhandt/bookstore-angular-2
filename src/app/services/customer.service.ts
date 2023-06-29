@@ -15,9 +15,7 @@ import {AddressModel} from "../data/address.model";
 import {CommercetoolsApiService} from "./infrastructure/commercetools.api.service";
 import {AbstractCommercetoolsService} from "./abstract/abstract.commercetools.service";
 import {CartService} from "./cart.service";
-import {OrderService} from "./order.service";
-
-const CURRENT_CUSTOMER = 'current_customer'
+import {CURRENT_CUSTOMER} from "../data/constants";
 
 export enum LoginSuccess {
   SUCCESS, WRONG_CREDENTIALS, UNKNOWN

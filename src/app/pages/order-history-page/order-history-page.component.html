@@ -5,26 +5,31 @@
         <h3>Ihre Bestellhistorie</h3>
       </div>
     </div>
-    <div class="row">
-      <table class="table table-striped">
-        <thead>
-        <tr>
-          <th scope="col">Bestellnummer</th>
-          <th scope="col">Bestelldatum</th>
-          <th scope="col">Bestellstatus</th>
-          <th scope="col"></th>
-        </tr>
-        </thead>
-        <tbody>
-        <tr *ngFor="let order of orderHistoryList">
-          <td>{{order.id}}</td>
-          <td>11.04.2023</td>
-          <td>in Bearbeitung</td>
-          <td><a href="#">Details</a></td>
-        </tr>
-        </tbody>
-      </table>
+    <div class="row empty-order-history" *ngIf="orderHistoryList.length === 0">
+      <h5>Sie haben noch keine Bestellungen getätigt.</h5>
     </div>
+    <ng-container *ngIf="orderHistoryList.length > 0">
+      <div class="row">
+        <table class="table table-striped">
+          <thead>
+          <tr>
+            <th scope="col">Bestellnummer</th>
+            <th scope="col">Bestelldatum</th>
+            <th scope="col">Bestellstatus</th>
+            <th scope="col"></th>
+          </tr>
+          </thead>
+          <tbody>
+          <tr *ngFor="let order of orderHistoryList">
+            <td>{{order.id}}</td>
+            <td>{{order.orderDate | date}}</td>
+            <td>{{order.orderState}}</td>
+            <td><a href="#">Details</a></td>
+          </tr>
+          </tbody>
+        </table>
+      </div>
+    </ng-container>
   </div>
 </ng-container>
 

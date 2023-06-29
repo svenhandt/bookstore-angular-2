@@ -5,3 +5,9 @@
   text-align: center;
   color: darkblue;
 }
+
+.empty-order-history {
+  text-align: center;
+  color: darkblue;
+  font-style: italic;
+}

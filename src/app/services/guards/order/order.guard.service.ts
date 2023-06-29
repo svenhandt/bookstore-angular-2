@@ -1,8 +1,8 @@
 import { Injectable } from '@angular/core';
 import {ActivatedRouteSnapshot, CanActivate, Router, RouterStateSnapshot, UrlTree} from "@angular/router";
 import {Observable} from "rxjs";
-import {LAST_CREATED_ORDER} from "../../order.service";
 import {OrderModel} from "../../../data/order.model";
+import {LAST_CREATED_ORDER} from "../../../data/constants";
 
 @Injectable({
   providedIn: 'root'

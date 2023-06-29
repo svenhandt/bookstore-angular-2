@@ -9,6 +9,7 @@ import {
   PaymentMethodInfo
 } from "@commercetools/platform-sdk";
 import {BehaviorSubject} from "rxjs";
+import {SESSION_PAYMENT_INFO} from "../data/constants";
 
 @Injectable({
   providedIn: 'root'
@@ -26,7 +27,7 @@ export class PaymentService extends AbstractCommercetoolsService {
   }
 
   addOrChangeAmountInPaymentInfo(paymentAmount: Money) {
-    const myPaymentAsStr = localStorage.getItem('session_payment_info')
+    const myPaymentAsStr = localStorage.getItem(SESSION_PAYMENT_INFO)
     if(myPaymentAsStr) {
       const myPayment = JSON.parse(myPaymentAsStr) as MyPayment
       this.changeAmountInPaymentInfo(myPayment, paymentAmount)
@@ -37,7 +38,7 @@ export class PaymentService extends AbstractCommercetoolsService {
   }
 
   addAuthorizeTransactionToPaymentInfo() {
-    const myPaymentAsStr = localStorage.getItem('session_payment_info')
+    const myPaymentAsStr = localStorage.getItem(SESSION_PAYMENT_INFO)
     if(myPaymentAsStr) {
       const myPayment = JSON.parse(myPaymentAsStr) as MyPayment
       const addAuthorizationTransactionAction: MyPaymentUpdateAction = {
@@ -54,7 +55,7 @@ export class PaymentService extends AbstractCommercetoolsService {
   }
 
   checkHasPaymentInfo() {
-    return !!localStorage.getItem('session_payment_info')
+    return !!localStorage.getItem(SESSION_PAYMENT_INFO)
   }
 
   resetPaymentUpdated() {
@@ -64,7 +65,7 @@ export class PaymentService extends AbstractCommercetoolsService {
   resetAll() {
     this.paymentAmountUpdatedSubject.next(false)
     this.paymentAuthorizedSubject.next(false)
-    localStorage.removeItem('session_payment_info')
+    localStorage.removeItem(SESSION_PAYMENT_INFO)
   }
 
   private changeAmountInPaymentInfo(myPayment: MyPayment, paymentAmount: Money) {
@@ -123,12 +124,12 @@ export class PaymentService extends AbstractCommercetoolsService {
 
   private updatePaymentAmountInSessionAndSubject(myPayment: MyPayment) {
     console.log(myPayment)
-    localStorage.setItem('session_payment_info', JSON.stringify(myPayment))
+    localStorage.setItem(SESSION_PAYMENT_INFO, JSON.stringify(myPayment))
     this.paymentAmountUpdatedSubject.next(true)
   }
 
   private updatePaymentAuthStatusInSessionAndSubject(myPayment: MyPayment) {
-    localStorage.setItem('session_payment_info', JSON.stringify(myPayment))
+    localStorage.setItem(SESSION_PAYMENT_INFO, JSON.stringify(myPayment))
     if(this.isPaymentAuthorized(myPayment)) {
       this.paymentAuthorizedSubject.next(true)
     }

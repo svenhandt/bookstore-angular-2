@@ -9,13 +9,23 @@ import {AbstractOrderService} from "./abstract.order.service";
 import {CartService} from "./cart.service";
 import {PaymentService} from "./payment.service";
 import {CustomerService} from "./customer.service";
+import {LAST_CREATED_ORDER} from "../data/constants";
 
-export const LAST_CREATED_ORDER = 'last_created_order'
+type OrderStateTranslateMapping = {
+  [key: string]: string
+}
 
 @Injectable({
   providedIn: 'root'
 })
 export class OrderService extends AbstractCommercetoolsService {
+
+  private orderStateTranslateMapping: OrderStateTranslateMapping = {
+    'Open': 'Offen',
+    'Confirmed': 'Bestätigt',
+    'Cancelled': 'Storniert',
+    'Complete': 'Abgeschlossen'
+  }
 
   private createdOrderSubject = new BehaviorSubject<OrderModel>(null)
   createdOrder$ = this.createdOrderSubject.asObservable()
@@ -111,12 +121,13 @@ export class OrderService extends AbstractCommercetoolsService {
     const order = new OrderModel()
     this.abstractOrderService.build(order, rawOrder)
     this.setOrderState(order, rawOrder)
+    order.orderDate = new Date(rawOrder.createdAt)
     return order
   }
 
   private setOrderState(order: OrderModel, rawOrder: Order) {
     const rawOrderState = rawOrder.orderState as 'Open' | 'Confirmed' | 'Cancelled' | 'Complete'
-    order.orderState = rawOrderState
+    order.orderState = this.orderStateTranslateMapping[rawOrderState]
   }
 
 }

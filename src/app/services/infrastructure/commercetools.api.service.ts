@@ -16,6 +16,7 @@ import {CustomerModel} from "../../data/customer.model";
 import {
   ByProjectKeyRequestBuilder
 } from "@commercetools/platform-sdk/dist/declarations/src/generated/client/by-project-key-request-builder";
+import {LAST_CREATED_ORDER, SESSION_PAYMENT_INFO} from "../../data/constants";
 
 @Injectable({
   providedIn: 'root'
@@ -80,8 +81,8 @@ export class CommercetoolsApiService {
 
   private getAnonymousSessionFlowMiddleware() {
     CommercetoolsApiService.clearTokenCache()
-    localStorage.removeItem('session_payment_info')
-    localStorage.removeItem('last_created_order')
+    localStorage.removeItem(SESSION_PAYMENT_INFO)
+    localStorage.removeItem(LAST_CREATED_ORDER)
     const anonymousAuthMiddlewareOptions: AnonymousAuthMiddlewareOptions = {
       host: environment.authHost,
       projectKey: environment.projectKey,
