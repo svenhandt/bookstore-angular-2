@@ -92,6 +92,13 @@ export class CustomerService extends AbstractCommercetoolsService {
     this.cartService.retrieveCurrentCart()
   }
 
+  isCustomerLoggedIn() {
+    const currentCustomerInSessionAsStr = localStorage.getItem(CURRENT_CUSTOMER)
+    const currentCustomerInSession = JSON.parse(currentCustomerInSessionAsStr)
+    const currentCustomerInSubject = this.currentCustomerSubject.getValue()
+    return currentCustomerInSession && currentCustomerInSubject
+  }
+
   private initCurrentCustomer() {
     const currentCustomerStr = localStorage.getItem(CURRENT_CUSTOMER)
     if(currentCustomerStr) {

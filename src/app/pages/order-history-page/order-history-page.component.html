@@ -24,7 +24,13 @@
             <td>{{order.id}}</td>
             <td>{{order.orderDate | date}}</td>
             <td>{{order.orderState}}</td>
-            <td><a href="#">Details</a></td>
+            <td>
+              <a class="link-info"
+                   style="cursor: pointer"
+                   (click)="onNavigateToOrderDetails(order)">
+                Details
+              </a>
+            </td>
           </tr>
           </tbody>
         </table>

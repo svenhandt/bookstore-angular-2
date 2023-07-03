@@ -33,6 +33,9 @@ export class OrderService extends AbstractCommercetoolsService {
   private orderHistoryListSubject = new BehaviorSubject<OrderModel[]>([])
   orderHistoryList$ = this.orderHistoryListSubject.asObservable()
 
+  private orderDetailsFromHistorySubject = new BehaviorSubject<OrderModel>(null)
+  orderDetailsFromHistory$ = this.orderDetailsFromHistorySubject.asObservable()
+
   constructor(commercetoolsApiService: CommercetoolsApiService,
               private abstractOrderService: AbstractOrderService,
               private cartService: CartService,
@@ -40,7 +43,7 @@ export class OrderService extends AbstractCommercetoolsService {
               private paymentService: PaymentService) {
     super(commercetoolsApiService)
     this.setCreatedOrderFromSession()
-    this.createCheckCreatedOrderInterval()
+    this.createCheckOrderSubjectsInterval()
   }
 
   createOrderFromCart(currentCart: CartModel) {
@@ -70,6 +73,21 @@ export class OrderService extends AbstractCommercetoolsService {
     }
   }
 
+  retrieveOrderDetailsFromHistory(orderId: string) {
+    const orderDetailsFromHistory = this.orderDetailsFromHistorySubject.getValue()
+    if(!orderDetailsFromHistory || orderId !== orderDetailsFromHistory.id) {
+      this.retrieveOrderDetailsFromCommercetools(orderId)
+    }
+  }
+
+  setOrderDetailsFromHistory(orderModel: OrderModel) {
+    this.orderDetailsFromHistorySubject.next(orderModel)
+  }
+
+  resetOrderDetailsFromHistory() {
+    this.orderDetailsFromHistorySubject.next(null)
+  }
+
   private retrieveOrderHistoryFromCommercetools() {
     this.apiRoot
       .me()
@@ -84,6 +102,19 @@ export class OrderService extends AbstractCommercetoolsService {
       })
   }
 
+  private retrieveOrderDetailsFromCommercetools(orderId: string) {
+    this.apiRoot
+      .me()
+      .orders()
+      .withId({ID: orderId})
+      .get()
+      .execute()
+      .then(({body}: ClientResponse<Order>) => {
+        const order = this.createOrder(body)
+        this.orderDetailsFromHistorySubject.next(order)
+      })
+  }
+
   private setCreatedOrderFromSession() {
     const createdOrderAsStr = localStorage.getItem(LAST_CREATED_ORDER)
     if(createdOrderAsStr) {
@@ -92,21 +123,21 @@ export class OrderService extends AbstractCommercetoolsService {
     }
   }
 
-  private createCheckCreatedOrderInterval() {
-    setInterval(() => {
-      const createdOrder = localStorage.getItem(LAST_CREATED_ORDER)
-      if(!createdOrder) {
-        this.createdOrderSubject.next(null)
-      }
-    }, 2000)
-  }
-
   private handleCreateOrderResponseSuccess(rawOrder: Order) {
     const order = this.createOrder(rawOrder)
     this.cartService.retrieveCurrentCart()
     this.paymentService.resetAll()
     localStorage.setItem(LAST_CREATED_ORDER, JSON.stringify(order));
     this.createdOrderSubject.next(order)
+    this.addToOrderHistory(order)
+  }
+
+  private addToOrderHistory(order: OrderModel) {
+    const orderHistoryList = this.orderHistoryListSubject.getValue()
+    if(orderHistoryList) {
+      orderHistoryList.push(order)
+      this.orderHistoryListSubject.next(orderHistoryList)
+    }
   }
 
   private createOrdersForHistory(rawOrders: Order[]) {
@@ -128,6 +159,27 @@ export class OrderService extends AbstractCommercetoolsService {
   private setOrderState(order: OrderModel, rawOrder: Order) {
     const rawOrderState = rawOrder.orderState as 'Open' | 'Confirmed' | 'Cancelled' | 'Complete'
     order.orderState = this.orderStateTranslateMapping[rawOrderState]
+  }
+
+  private createCheckOrderSubjectsInterval() {
+    setInterval(() => {
+      this.checkAndCorrectCreatedOrderSubject()
+      this.checkAndCorrectOrderHistorySubject()
+    }, 2000)
+  }
+
+  private checkAndCorrectCreatedOrderSubject() {
+    const createdOrderInSession = localStorage.getItem(LAST_CREATED_ORDER)
+    const createdOrderInSubject = this.createdOrderSubject.getValue()
+    if(!createdOrderInSession && createdOrderInSubject) {
+      this.createdOrderSubject.next(null)
+    }
+  }
+
+  private checkAndCorrectOrderHistorySubject() {
+    if(!this.customerService.isCustomerLoggedIn()) {
+      this.orderHistoryListSubject.next([])
+    }
   }
 
 }

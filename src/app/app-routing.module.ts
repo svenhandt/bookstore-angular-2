@@ -30,7 +30,7 @@ const routes: Routes = [
   {path: 'checkout-summary', component: CheckoutSummaryPageComponent, canActivate: [AuthGuardService, PaymentGuardService]},
   {path: 'order-confirmation', component: OrderConfirmationPageComponent, canActivate: [AuthGuardService, OrderGuardService]},
   {path: 'order-history', component: OrderHistoryPageComponent, canActivate: [AuthGuardService]},
-  {path: 'order-history-details', component: OrderHistoryDetailsPageComponent, canActivate: [AuthGuardService]},
+  {path: 'order-history-details/:id', component: OrderHistoryDetailsPageComponent, canActivate: [AuthGuardService]},
   {path: 'login-register', component: LoginRegisterPageComponent, canActivate: [LoginPageGuardService]},
   {path: 'edit-customer', component: EditCustomerDetailsPageComponent, canActivate: [AuthGuardService]}
 ];
