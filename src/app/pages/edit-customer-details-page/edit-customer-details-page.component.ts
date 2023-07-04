@@ -30,23 +30,30 @@ export class EditCustomerDetailsPageComponent implements OnInit, OnDestroy {
     const lastName = customer.lastName
     const email = customer.email
     const address = customer.address
-    if(address) {
-      const addressFormGroup = this.initCustomerFormAddress(address)
-    }
-
+    this.editCustomerForm = new FormGroup({
+      'firstName': new FormControl(firstName, Validators.required),
+      'lastName': new FormControl(lastName, Validators.required),
+      'address': this.initCustomerFormAddress(address),
+    })
   }
 
   private initCustomerFormAddress(address: AddressModel) {
-    const street = address.street
-    const streetNumber = address.streetNumber
-    const zipCode = address.zipCode
-    const town = address.town
-    const addressFormGroup = new FormGroup({
-      'street': new FormControl(street, Validators.required),
-      'streetNumber': new FormControl(streetNumber, Validators.required),
-      'zipCode': new FormControl(zipCode, [Validators.required, Validators.pattern(/^[0-9]{5}$/)]),
-      'town': new FormControl(town, Validators.required)
-    })
+    let addressFormGroup
+    if(address) {
+      const street = address.street
+      const streetNumber = address.streetNumber
+      const zipCode = address.zipCode
+      const town = address.town
+      addressFormGroup = new FormGroup({
+        'street': new FormControl(street, Validators.required),
+        'streetNumber': new FormControl(streetNumber, Validators.required),
+        'zipCode': new FormControl(zipCode, [Validators.required, Validators.pattern(/^[0-9]{5}$/)]),
+        'town': new FormControl(town, Validators.required)
+      })
+    }
+    else {
+      addressFormGroup = new FormGroup({})
+    }
     return addressFormGroup
   }
 
