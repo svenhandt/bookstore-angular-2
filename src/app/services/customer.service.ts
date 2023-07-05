@@ -7,9 +7,9 @@ import {
   CustomerSignin,
   CustomerSignInResult,
   ErrorResponse,
-  InvalidCredentialsError, Money,
+  InvalidCredentialsError,
   MyCustomerDraft,
-  MyCustomerSignin, MyPayment, MyPaymentDraft
+  MyCustomerSignin
 } from "@commercetools/platform-sdk";
 import {AddressModel} from "../data/address.model";
 import {CommercetoolsApiService} from "./infrastructure/commercetools.api.service";
@@ -23,6 +23,17 @@ export enum LoginSuccess {
 
 export enum RegistrationSuccess {
   SUCCESS, CUSTOMER_ALREADY_REGISTERED, OTHER_ERROR, UNKNOWN
+}
+
+interface CustomerUpdateDraft {
+  firstName: string,
+  lastName: string,
+  address: {
+    street: string,
+    streetNumber: string,
+    zipCode: string,
+    town: string
+  }
 }
 
 @Injectable({
@@ -92,6 +103,13 @@ export class CustomerService extends AbstractCommercetoolsService {
     this.cartService.retrieveCurrentCart()
   }
 
+  checkAndUpdateCurrentCustomer(customerUpdateDraft: CustomerUpdateDraft) {
+    const currentCustomer = this.currentCustomerSubject.value
+    if(currentCustomer && currentCustomer.address) {
+      this.updateCurrentCustomer(customerUpdateDraft, currentCustomer)
+    }
+  }
+
   isCustomerLoggedIn() {
     const currentCustomerInSessionAsStr = localStorage.getItem(CURRENT_CUSTOMER)
     const currentCustomerInSession = JSON.parse(currentCustomerInSessionAsStr)
@@ -140,6 +158,38 @@ export class CustomerService extends AbstractCommercetoolsService {
     this.commercetoolsApiService.buildApiRoot()
     this.currentCustomerSubject.next(customer)
     this.cartService.setCurrentCart(customerSignInResult.cart)
+  }
+
+  private updateCurrentCustomer(customerUpdateDraft: CustomerUpdateDraft, currentCustomer: CustomerModel) {
+    this.apiRoot.me()
+      .post({
+        body: {
+          version: currentCustomer.version,
+          actions: [
+            {
+              action: 'setFirstName',
+              firstName: customerUpdateDraft.firstName
+            },
+            {
+              action: 'setLastName',
+              lastName: customerUpdateDraft.lastName
+            },
+            {
+              action: "changeAddress",
+              addressId: currentCustomer.address.id,
+              address: {
+                firstName: customerUpdateDraft.firstName,
+                lastName: customerUpdateDraft.lastName,
+                streetName: customerUpdateDraft.address.street,
+                streetNumber: customerUpdateDraft.address.streetNumber,
+                postalCode: customerUpdateDraft.address.zipCode,
+                city: customerUpdateDraft.address.town,
+                country: currentCustomer.address.country
+              }
+            }
+          ]
+        }
+      })
   }
 
   private createCustomer(rawCustomer: Customer) {

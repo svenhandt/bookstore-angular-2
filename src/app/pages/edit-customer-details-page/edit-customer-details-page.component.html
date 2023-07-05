@@ -1,43 +1,66 @@
-<div class="container">
-  <div class="row">
-    <div class="col-12 edit-customer-header">
-      <h3>Ihre Kundendaten</h3>
-      <p></p>
+<ng-container *ngIf="(currentCustomer$ | async) as currentCustomer">
+  <div class="container">
+    <div class="row">
+      <div class="col-12 edit-customer-header">
+        <h3>Ihre Kundendaten</h3>
+        <p>Kunden-ID: {{currentCustomer.email}}</p>
+      </div>
     </div>
-  </div>
-  <div class="row">
-    <div class="col-12 edit-customer">
-      <form>
-        <div class="mb-3">
-          <label for="firstName" class="form-label">Vorname</label>
-          <input type="text" class="form-control" id="firstName">
-        </div>
-        <div class="mb-3">
-          <label for="lastName" class="form-label">Nachname</label>
-          <input type="text" class="form-control" id="lastName">
-        </div>
-        <div class="mb-3">
-          <div class="col">
-            <label class="form-label">Strasse und Nr.</label>
-            <div class="input-group">
-              <input type="text" class="form-control" id="street">
-              <input type="text" class="form-control" id="streetNumber">
+    <div class="row">
+      <div class="col-12 edit-customer">
+        <form [formGroup]="editCustomerForm" (ngSubmit)="onSubmitEditCustomerForm()">
+          <div class="mb-3">
+            <label for="firstName" class="form-label">Vorname</label>
+            <input
+              type="text"
+              class="form-control"
+              id="firstName"
+              formControlName="firstName">
+            <p class="alert alert-danger" *ngIf="!editCustomerFormControl['firstName'].valid">Bitte geben Sie einen Vornamen ein</p>
+          </div>
+          <div class="mb-3">
+            <label for="lastName" class="form-label">Nachname</label>
+            <input type="text"
+                   class="form-control"
+                   id="lastName"
+                   formControlName="lastName">
+          </div>
+          <div class="mb-3" formGroupName="address">
+            <div class="col">
+              <label class="form-label">Strasse und Nr.</label>
+              <div class="input-group">
+                <input type="text"
+                       class="form-control"
+                       id="street"
+                       formControlName="street">
+                <input type="text"
+                       class="form-control"
+                       id="streetNumber"
+                       formControlName="streetNumber">
+              </div>
             </div>
           </div>
-        </div>
-        <div class="mb-3">
-          <div class="col">
-            <label class="form-label">PLZ und Ort</label>
-            <div class="input-group">
-              <input type="text" class="form-control " id="zipCode">
-              <input type="text" class="form-control" id="town">
+          <div class="mb-3" formGroupName="address">
+            <div class="col">
+              <label class="form-label">PLZ und Ort</label>
+              <div class="input-group">
+                <input type="text"
+                       class="form-control"
+                       id="zipCode"
+                       formControlName="zipCode">
+                <input type="text"
+                       class="form-control"
+                       id="town"
+                       formControlName="town">
+              </div>
             </div>
           </div>
-        </div>
-        <div class="edit-customer-buttons">
-          <button type="submit" class="btn btn-primary">Speichern</button>
-        </div>
-      </form>
+          <div class="edit-customer-buttons">
+            <button type="submit" class="btn btn-primary">Speichern</button>
+          </div>
+        </form>
+      </div>
     </div>
   </div>
-</div>
+
+</ng-container>
