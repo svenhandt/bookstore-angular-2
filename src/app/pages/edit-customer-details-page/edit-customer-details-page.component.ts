@@ -10,7 +10,7 @@ import {AddressModel} from "../../data/address.model";
   templateUrl: './edit-customer-details-page.component.html',
   styleUrls: ['./edit-customer-details-page.component.css']
 })
-export class EditCustomerDetailsPageComponent implements OnInit {
+export class EditCustomerDetailsPageComponent implements OnInit, OnDestroy {
 
   editCustomerForm: FormGroup
 
@@ -94,6 +94,10 @@ export class EditCustomerDetailsPageComponent implements OnInit {
         this.customerService.customerUpdateSuccessSubject.next(false)
       }, 3000)
     }
+  }
+
+  ngOnDestroy(): void {
+    this.customerService.customerUpdateSuccessSubject.next(false)
   }
 
 }
