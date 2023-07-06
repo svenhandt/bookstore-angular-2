@@ -15,6 +15,7 @@ export class EditCustomerDetailsPageComponent implements OnInit {
   editCustomerForm: FormGroup
 
   currentCustomer$: Observable<CustomerModel>
+  customerUpdateSuccess$: Observable<boolean>
 
   constructor(private customerService: CustomerService) { }
 
@@ -24,6 +25,11 @@ export class EditCustomerDetailsPageComponent implements OnInit {
         if(customer) {
           this.initCustomerForm(customer)
         }
+      })
+    )
+    this.customerUpdateSuccess$ = this.customerService.customerUpdateSuccess$.pipe(
+      tap(customerUpdateSuccess => {
+        this.resetCustomerUpdateSuccessAfterDelay(customerUpdateSuccess)
       })
     )
   }
@@ -44,6 +50,11 @@ export class EditCustomerDetailsPageComponent implements OnInit {
 
   get editCustomerFormControl() {
     return this.editCustomerForm.controls
+  }
+
+  get editCustomerFormAddressControl() {
+    const addressFormGroup = this.editCustomerForm.controls['address'] as FormGroup
+    return addressFormGroup.controls
   }
 
   private initCustomerForm(customer: CustomerModel) {
@@ -75,6 +86,14 @@ export class EditCustomerDetailsPageComponent implements OnInit {
       addressFormGroup = new FormGroup({})
     }
     return addressFormGroup
+  }
+
+  private resetCustomerUpdateSuccessAfterDelay(customerUpdateSuccess: boolean) {
+    if(customerUpdateSuccess) {
+      setTimeout(() => {
+        this.customerService.customerUpdateSuccessSubject.next(false)
+      }, 3000)
+    }
   }
 
 }

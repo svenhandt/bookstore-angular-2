@@ -50,6 +50,9 @@ export class CustomerService extends AbstractCommercetoolsService {
   logoutSuccessSubject = new BehaviorSubject<boolean>(false)
   logoutSuccess$ = this.logoutSuccessSubject.asObservable()
 
+  customerUpdateSuccessSubject = new BehaviorSubject<boolean>(false)
+  customerUpdateSuccess$ = this.customerUpdateSuccessSubject.asObservable()
+
   registrationSuccessSubject = new BehaviorSubject<RegistrationSuccess>(RegistrationSuccess.UNKNOWN)
   registrationSuccess$ = this.registrationSuccessSubject.asObservable()
 
@@ -152,6 +155,7 @@ export class CustomerService extends AbstractCommercetoolsService {
   }
 
   private handleAuthenticationSuccess(customerSignInResult: CustomerSignInResult, password: string) {
+    console.log(customerSignInResult.customer)
     const customer = this.createCustomer(customerSignInResult.customer)
     customer.password = password
     localStorage.setItem(CURRENT_CUSTOMER, JSON.stringify(customer))
@@ -190,6 +194,19 @@ export class CustomerService extends AbstractCommercetoolsService {
           ]
         }
       })
+      .execute()
+      .then(({body}: ClientResponse<Customer>) => {
+        this.handleUpdateCustomerSuccess(body)
+      })
+  }
+
+  private handleUpdateCustomerSuccess(rawCustomer: Customer) {
+    const updatedCustomer = this.createCustomer(rawCustomer)
+    const customerInSession = JSON.parse(localStorage.getItem(CURRENT_CUSTOMER))
+    updatedCustomer.password = customerInSession.password
+    localStorage.setItem(CURRENT_CUSTOMER, JSON.stringify(updatedCustomer))
+    this.currentCustomerSubject.next(updatedCustomer)
+    this.customerUpdateSuccessSubject.next(true)
   }
 
   private createCustomer(rawCustomer: Customer) {

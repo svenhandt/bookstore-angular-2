@@ -1,5 +1,8 @@
 <ng-container *ngIf="(currentCustomer$ | async) as currentCustomer">
   <div class="container">
+    <div *ngIf="(customerUpdateSuccess$ | async)" class="alert alert-success" role="alert">
+      Ihre Kundendaten wurden erfolgreich aktualisiert.
+    </div>
     <div class="row">
       <div class="col-12 edit-customer-header">
         <h3>Ihre Kundendaten</h3>
@@ -16,7 +19,7 @@
               class="form-control"
               id="firstName"
               formControlName="firstName">
-            <p class="alert alert-danger" *ngIf="!editCustomerFormControl['firstName'].valid">Bitte geben Sie einen Vornamen ein</p>
+            <p class="alert alert-danger" *ngIf="!editCustomerFormControl['firstName'].valid && editCustomerFormControl['firstName'].touched">Vorname darf nicht leer sein</p>
           </div>
           <div class="mb-3">
             <label for="lastName" class="form-label">Nachname</label>
@@ -24,6 +27,7 @@
                    class="form-control"
                    id="lastName"
                    formControlName="lastName">
+            <p class="alert alert-danger" *ngIf="!editCustomerFormControl['lastName'].valid && editCustomerFormControl['lastName'].touched">Nachname darf nicht leer sein</p>
           </div>
           <div class="mb-3" formGroupName="address">
             <div class="col">
@@ -38,6 +42,8 @@
                        id="streetNumber"
                        formControlName="streetNumber">
               </div>
+              <p class="alert alert-danger" *ngIf="!editCustomerFormAddressControl['street'].valid && editCustomerFormAddressControl['street'].touched">Strasse darf nicht leer sein</p>
+              <p class="alert alert-danger" *ngIf="!editCustomerFormAddressControl['streetNumber'].valid && editCustomerFormAddressControl['streetNumber'].touched">Hausnummer darf nicht leer sein</p>
             </div>
           </div>
           <div class="mb-3" formGroupName="address">
@@ -53,14 +59,17 @@
                        id="town"
                        formControlName="town">
               </div>
+              <p class="alert alert-danger" *ngIf="!editCustomerFormAddressControl['zipCode'].valid && editCustomerFormAddressControl['zipCode'].touched">PLZ darf nicht leer sein</p>
+              <p class="alert alert-danger" *ngIf="!editCustomerFormAddressControl['town'].valid && editCustomerFormAddressControl['town'].touched">Ort darf nicht leer sein</p>
             </div>
           </div>
           <div class="edit-customer-buttons">
-            <button type="submit" class="btn btn-primary">Speichern</button>
+            <button type="submit"
+                    class="btn btn-primary"
+                    [disabled]="!editCustomerForm.valid">Speichern</button>
           </div>
         </form>
       </div>
     </div>
   </div>
-
 </ng-container>
