@@ -78,6 +78,14 @@ export class HeaderComponent implements OnInit {
     this.categoryService.setSelectedCategory(category.key)
   }
 
+  onNavigateToMyOrderHistory() {
+    this.navigateAndResetSelectedCategory('/order-history')
+  }
+
+  onNavigateToMyCustomerData() {
+    this.navigateAndResetSelectedCategory('/edit-customer')
+  }
+
   onLogout() {
     this.customerService.logoutCurrentCustomer()
     this.router.navigate(['/login-register'])
@@ -108,6 +116,11 @@ export class HeaderComponent implements OnInit {
 
   resetSelectedCategory() {
     this.categoryService.setSelectedCategory(null)
+  }
+
+  private navigateAndResetSelectedCategory(path: string) {
+    this.router.navigate([path])
+    this.resetSelectedCategory()
   }
 
 }
